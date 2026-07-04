@@ -1,0 +1,40 @@
+{
+  "factors": [
+    {
+      "id": "trend_ma_20_60",
+      "name": "20/60 日均线趋势",
+      "family": "趋势跟踪",
+      "description": "用 20 日均线和 60 日均线判断中短期趋势。",
+      "default_risk": "均衡",
+      "enhanced": true,
+      "tags": ["趋势", "均线", "动量", "中期"]
+    },
+    {
+      "id": "rsi_reversal_14",
+      "name": "RSI 超跌修复",
+      "family": "均值回归",
+      "description": "用 RSI 识别短期超跌后的修复机会。",
+      "default_risk": "均衡",
+      "enhanced": true,
+      "tags": ["反转", "RSI", "超跌", "短期"]
+    },
+    {
+      "id": "bollinger_reversion_20",
+      "name": "20 日布林带边界",
+      "family": "布林带反转",
+      "description": "用价格偏离正常波动区间来捕捉修复机会。",
+      "default_risk": "均衡",
+      "enhanced": true,
+      "tags": ["布林带", "波动", "反转", "短期"]
+    },
+    {
+      "id": "multi_signal_vote",
+      "name": "趋势/RSI/布林带投票",
+      "family": "多策略投票",
+      "description": "多个基础信号同时确认后才入场，降低单一信号误判。",
+      "default_risk": "保守",
+      "enhanced": true,
+      "tags": ["多策略", "确认", "稳健", "组合"]
+    }
+  ]
+}

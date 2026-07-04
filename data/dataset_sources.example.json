@@ -1,0 +1,24 @@
+{
+  "local_dataset_dir": "local_data/DATASET",
+  "env_override": "STRATA_DATASET_DIR",
+  "sources": [
+    {
+      "name": "Eastmoney daily kline",
+      "type": "historical_price",
+      "provider": "Eastmoney",
+      "url_template": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "storage": "local_csv",
+      "version_control": "metadata_only"
+    }
+  ],
+  "tracked_symbols_example": [
+    "510300",
+    "510500",
+    "588000",
+    "159915",
+    "512100",
+    "600519",
+    "000001",
+    "300750"
+  ]
+}
