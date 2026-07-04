@@ -1,0 +1,88 @@
+{
+  "factors": [
+    {
+      "id": "trend_ma_20_60",
+      "name": "20/60 日均线趋势",
+      "family": "趋势跟踪",
+      "description": "用 20 日均线和 60 日均线判断中短期趋势。",
+      "default_risk": "均衡",
+      "enhanced": true,
+      "tags": ["趋势", "均线", "动量", "中期"],
+      "engine": "native"
+    },
+    {
+      "id": "rsi_reversal_14",
+      "name": "RSI 超跌修复",
+      "family": "均值回归",
+      "description": "用 RSI 识别短期超跌后的修复机会。",
+      "default_risk": "均衡",
+      "enhanced": true,
+      "tags": ["反转", "RSI", "超跌", "短期"],
+      "engine": "native"
+    },
+    {
+      "id": "bollinger_reversion_20",
+      "name": "20 日布林带边界",
+      "family": "布林带反转",
+      "description": "用价格偏离正常波动区间来捕捉修复机会。",
+      "default_risk": "均衡",
+      "enhanced": true,
+      "tags": ["布林带", "波动", "反转", "短期"],
+      "engine": "native"
+    },
+    {
+      "id": "multi_signal_vote",
+      "name": "趋势/RSI/布林带投票",
+      "family": "多策略投票",
+      "description": "多个基础信号同时确认后才入场，降低单一信号误判。",
+      "default_risk": "保守",
+      "enhanced": true,
+      "tags": ["多策略", "确认", "稳健", "组合"],
+      "engine": "native"
+    },
+    {
+      "id": "benchmark_relative_zscore",
+      "name": "基准线偏离 Z-score 策略",
+      "family": "趋势跟踪",
+      "description": "计算标的相对基准指数的 Z-score，偏离阈值时入场/出场。适合识别持续跑赢/跑输基准的趋势。",
+      "default_risk": "均衡",
+      "enhanced": true,
+      "tags": ["基准线", "相对强度", "Z-score", "超额收益"],
+      "engine": "vbt",
+      "vbt_params": {
+        "entry_zscore": 1.5,
+        "exit_zscore": 0.5,
+        "lookback": 60
+      }
+    },
+    {
+      "id": "benchmark_relative_ma",
+      "name": "基准线均线交叉策略",
+      "family": "趋势跟踪",
+      "description": "相对强度上穿均线时入场，下穿时出场。用标的/基准比值替代绝对价格的均线交叉。",
+      "default_risk": "均衡",
+      "enhanced": true,
+      "tags": ["基准线", "相对强度", "均线交叉", "趋势"],
+      "engine": "vbt",
+      "vbt_params": {
+        "ma_fast": 20,
+        "ma_slow": 60
+      }
+    },
+    {
+      "id": "external_factor_entry",
+      "name": "外部因子入口",
+      "family": "基础模板",
+      "description": "从外部数据源（基本面指标、情绪数据、另类数据等）注入因子，通过阈值触发交易信号。这是连接第三方数据到回测引擎的入口。",
+      "default_risk": "均衡",
+      "enhanced": false,
+      "tags": ["外部因子", "alpha", "另类数据", "扩展"],
+      "engine": "vbt",
+      "vbt_params": {
+        "entry_threshold": 0.0,
+        "exit_threshold": null,
+        "long_only": true
+      }
+    }
+  ]
+}
