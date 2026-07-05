@@ -68,7 +68,7 @@ def _symbol_by_code(code: str):
     return next((item for item in symbols if item.code == code), symbols[0])
 
 
-def _pick_symbol(text: str, fallback_code: str = "510300") -> str:
+def _pick_symbol(text: str, fallback_code: str = "SPY") -> str:
     symbols = load_symbols()
     compact = text.lower()
     for item in symbols:
@@ -107,7 +107,7 @@ def propose_backtest_spec(
     text = json.dumps({**prototype.as_dict(), "answers": answers}, ensure_ascii=False)
     fallback = BacktestSpec(
         symbol_code=_pick_symbol(prototype.target_universe),
-        benchmark_code="510300",
+        benchmark_code="SPY",
         family=factor_blend["base_factor"]["family"],
         risk_profile=factor_blend["base_factor"]["default_risk"] or _pick_risk(text),
         enhanced=bool(factor_blend["base_factor"]["enhanced"]),

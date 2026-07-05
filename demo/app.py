@@ -28,7 +28,8 @@ from interview_agent import (
     next_question,
     run_interview_turn,
 )
-from strategyforge import load_symbols, format_pct
+from market_data import filter_symbols, load_universe, normalize_market, preferred_benchmarks
+from strategyforge import format_pct
 
 
 st.set_page_config(page_title="智塔 Strata", page_icon="ST", layout="wide")
@@ -655,8 +656,8 @@ def render_backtest_transition(template: InterviewTemplate, answers: dict[str, s
             st.session_state.backtest_spec = propose_backtest_spec(st.session_state.prototype, answers, llm=llm)
         except Exception:
             st.session_state.backtest_spec = BacktestSpec(
-                symbol_code="510500",
-                benchmark_code="510300",
+                symbol_code="AAPL",
+                benchmark_code="SPY",
                 family=VALID_FAMILIES[1],
                 risk_profile=VALID_RISKS[1],
                 enhanced=True,
@@ -1124,9 +1125,9 @@ def render_backtest_panel(template: InterviewTemplate, answers: dict[str, str]) 
             st.rerun()
         return
 
-    symbols = load_symbols()
-    symbol_labels = {item.label: item.code for item in symbols}
-    code_to_label = {item.code: item.label for item in symbols}
+    universe = load_universe()
+    symbols = universe.symbols
+    symbol_by_code = {item.code: item for item in symbols}
     llm = OpenAICompatibleClient.from_env() if has_llm_env() else None
     if st.session_state.backtest_spec is None:
         try:
@@ -1150,8 +1151,64 @@ def render_backtest_panel(template: InterviewTemplate, answers: dict[str, str]) 
         unsafe_allow_html=True,
     )
 
-    target_label = st.selectbox("\u56de\u6d4b\u6807\u7684", list(symbol_labels), index=list(symbol_labels).index(code_to_label.get(spec.symbol_code, symbols[0].label)))
-    benchmark_label = st.selectbox("\u5bf9\u7167\u57fa\u51c6", list(symbol_labels), index=list(symbol_labels).index(code_to_label.get(spec.benchmark_code, symbols[0].label)))
+    current_symbol = symbol_by_code.get(spec.symbol_code, symbols[0])
+    filter_a, filter_b, filter_c = st.columns([1, 1, 1.4])
+    with filter_a:
+        market_options = ["全部", *universe.markets]
+        default_market = normalize_market(current_symbol)
+        market_filter = st.selectbox(
+            "市场",
+            market_options,
+            index=market_options.index(default_market) if default_market in market_options else 0,
+            key="backtest_market_filter",
+        )
+    with filter_b:
+        category_options = ["全部", *universe.categories]
+        default_category = current_symbol.category if current_symbol.category in category_options else "全部"
+        category_filter = st.selectbox(
+            "行业 / 类型",
+            category_options,
+            index=category_options.index(default_category),
+            key="backtest_category_filter",
+        )
+    with filter_c:
+        query_filter = st.text_input("搜索标的", value="", placeholder="例如：NVDA、Apple、Hong Kong、ETF", key="backtest_symbol_query")
+
+    target_candidates = filter_symbols(
+        symbols,
+        market=market_filter,
+        category=category_filter,
+        query=query_filter,
+        min_rows=252,
+        include_benchmarks=False,
+    )
+    if current_symbol.code not in {item.code for item in target_candidates}:
+        target_candidates = [current_symbol, *target_candidates]
+    if not target_candidates:
+        target_candidates = filter_symbols(symbols, min_rows=252, include_benchmarks=False)[:100]
+
+    target_labels = {item.label: item.code for item in target_candidates}
+    target_default_label = current_symbol.label if current_symbol.label in target_labels else target_candidates[0].label
+    target_label = st.selectbox(
+        "\u56de\u6d4b\u6807\u7684",
+        list(target_labels),
+        index=list(target_labels).index(target_default_label),
+        key="backtest_target_symbol",
+    )
+    selected_symbol = symbol_by_code.get(target_labels[target_label], current_symbol)
+    benchmark_candidates = preferred_benchmarks(selected_symbol, universe)
+    if spec.benchmark_code in symbol_by_code and spec.benchmark_code not in {item.code for item in benchmark_candidates}:
+        benchmark_candidates = [symbol_by_code[spec.benchmark_code], *benchmark_candidates]
+    if not benchmark_candidates:
+        benchmark_candidates = [selected_symbol]
+    benchmark_labels = {item.label: item.code for item in benchmark_candidates}
+    benchmark_default = symbol_by_code.get(spec.benchmark_code, benchmark_candidates[0]).label
+    benchmark_label = st.selectbox(
+        "\u5bf9\u7167\u57fa\u51c6",
+        list(benchmark_labels),
+        index=list(benchmark_labels).index(benchmark_default) if benchmark_default in benchmark_labels else 0,
+        key="backtest_benchmark_symbol",
+    )
     left, right = st.columns(2)
     with left:
         family = st.selectbox("\u7b56\u7565\u4ee3\u7801", list(VALID_FAMILIES), index=list(VALID_FAMILIES).index(spec.family))
@@ -1161,7 +1218,7 @@ def render_backtest_panel(template: InterviewTemplate, answers: dict[str, str]) 
         enhanced = st.checkbox("\u542f\u7528\u786e\u5b9a\u6027\u98ce\u63a7\u589e\u5f3a", value=spec.enhanced)
 
     if st.button("\u8fd0\u884c\u56de\u6d4b", type="primary", use_container_width=True):
-        chosen = BacktestSpec(symbol_code=symbol_labels[target_label], benchmark_code=symbol_labels[benchmark_label], family=family, risk_profile=risk, enhanced=enhanced, window=window, base_factor_id=factor_blend["base_factor"]["id"], user_factor_weight=float(factor_blend["user_weight"]))
+        chosen = BacktestSpec(symbol_code=target_labels[target_label], benchmark_code=benchmark_labels[benchmark_label], family=family, risk_profile=risk, enhanced=enhanced, window=window, base_factor_id=factor_blend["base_factor"]["id"], user_factor_weight=float(factor_blend["user_weight"]))
         st.session_state.backtest_spec = chosen
         st.session_state.backtest_result = run_backtest_from_spec(chosen)
         st.session_state.backtest_result["factor_blend"] = factor_blend

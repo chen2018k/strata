@@ -35,6 +35,42 @@
       "default_risk": "保守",
       "enhanced": true,
       "tags": ["多策略", "确认", "稳健", "组合"]
+    },
+    {
+      "id": "relative_strength_momentum",
+      "name": "相对强弱动量",
+      "family": "趋势跟踪",
+      "description": "用价格相对强弱和中期趋势筛选更强的标的，适合美股和 ETF 候选池。",
+      "default_risk": "均衡",
+      "enhanced": true,
+      "tags": ["趋势", "动量", "相对强弱", "美股", "ETF"]
+    },
+    {
+      "id": "low_volatility_guard",
+      "name": "低波动风控",
+      "family": "多策略投票",
+      "description": "优先选择波动更可控的信号组合，降低单一标的大幅回撤风险。",
+      "default_risk": "保守",
+      "enhanced": true,
+      "tags": ["低波动", "风控", "回撤", "稳健"]
+    },
+    {
+      "id": "sector_rotation_proxy",
+      "name": "行业轮动代理",
+      "family": "多策略投票",
+      "description": "把用户的一手行业观察映射到行业 ETF、龙头股和相关供应链标的上做验证。",
+      "default_risk": "均衡",
+      "enhanced": true,
+      "tags": ["行业", "ETF", "轮动", "供应链", "港股", "新加坡"]
+    },
+    {
+      "id": "earnings_revision_proxy",
+      "name": "预期修正代理",
+      "family": "趋势跟踪",
+      "description": "用价格趋势和成交确认近似捕捉订单、利润率、上调指引等预期修正。",
+      "default_risk": "进取",
+      "enhanced": true,
+      "tags": ["订单", "利润率", "预期", "趋势", "财报"]
     }
   ]
 }

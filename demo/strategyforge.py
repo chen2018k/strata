@@ -16,6 +16,10 @@ def _default_dataset_dir() -> Path:
         return Path(env_path)
 
     current = Path(__file__).resolve()
+    app_dataset = current.parent / "DATASET"
+    if (app_dataset / "metadata.json").exists():
+        return app_dataset
+
     for parent in current.parents:
         candidate = parent / "local_data" / "DATASET"
         if (candidate / "metadata.json").exists():
