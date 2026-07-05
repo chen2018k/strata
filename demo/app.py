@@ -603,12 +603,44 @@ def render_landing_auth_buttons() -> None:
 
 def _format_summary_table(summary):
     display = summary.copy()
-    for column in ["累计收益", "基准收益", "超额收益", "最大回撤", "胜率", "持仓天数占比"]:
+    for column in ["累计收益", "基准收益", "超额收益", "年化收益", "年化波动", "最大回撤", "胜率", "持仓天数占比"]:
         if column in display.columns:
             display[column] = display[column].map(lambda value: format_pct(float(value)))
-    if "夏普比率" in display.columns:
-        display["夏普比率"] = display["夏普比率"].map(lambda value: f"{float(value):.2f}")
+    for column in ["夏普比率", "信息比率", "盈亏比"]:
+        if column in display.columns:
+            display[column] = display[column].map(lambda value: f"{float(value):.2f}")
     return display
+
+
+def _format_candidate_table(summary):
+    display = summary.copy()
+    for column in ["累计收益", "基准收益", "超额收益", "年化收益", "年化波动", "最大回撤", "胜率", "持仓天数占比", "行业基准收益", "相对行业超额"]:
+        if column in display.columns:
+            display[column] = display[column].map(lambda value: format_pct(float(value)))
+    for column in ["夏普比率", "信息比率", "盈亏比", "综合评分"]:
+        if column in display.columns:
+            display[column] = display[column].map(lambda value: f"{float(value):.2f}")
+    preferred = [
+        "推荐",
+        "标的",
+        "名称",
+        "市场",
+        "行业",
+        "对照基准",
+        "累计收益",
+        "行业基准收益",
+        "相对行业超额",
+        "最大回撤",
+        "夏普比率",
+        "信息比率",
+        "胜率",
+        "盈亏比",
+        "最大连续亏损",
+        "交易次数",
+        "综合评分",
+    ]
+    columns = [column for column in preferred if column in display.columns]
+    return display[columns] if columns else display
 
 
 
@@ -1150,6 +1182,10 @@ def render_backtest_panel(template: InterviewTemplate, answers: dict[str, str]) 
         """,
         unsafe_allow_html=True,
     )
+    structured_spec = spec.as_dict()
+    structured_spec["candidate_symbols"] = list(spec.candidate_symbols)
+    st.caption("结构化策略规格")
+    st.json(structured_spec, expanded=False)
 
     current_symbol = symbol_by_code.get(spec.symbol_code, symbols[0])
     filter_a, filter_b, filter_c = st.columns([1, 1, 1.4])
@@ -1218,7 +1254,20 @@ def render_backtest_panel(template: InterviewTemplate, answers: dict[str, str]) 
         enhanced = st.checkbox("\u542f\u7528\u786e\u5b9a\u6027\u98ce\u63a7\u589e\u5f3a", value=spec.enhanced)
 
     if st.button("\u8fd0\u884c\u56de\u6d4b", type="primary", use_container_width=True):
-        chosen = BacktestSpec(symbol_code=target_labels[target_label], benchmark_code=benchmark_labels[benchmark_label], family=family, risk_profile=risk, enhanced=enhanced, window=window, base_factor_id=factor_blend["base_factor"]["id"], user_factor_weight=float(factor_blend["user_weight"]))
+        chosen = BacktestSpec(
+            symbol_code=target_labels[target_label],
+            benchmark_code=benchmark_labels[benchmark_label],
+            family=family,
+            risk_profile=risk,
+            enhanced=enhanced,
+            window=window,
+            base_factor_id=factor_blend["base_factor"]["id"],
+            user_factor_weight=float(factor_blend["user_weight"]),
+            market=market_filter if market_filter != "全部" else normalize_market(selected_symbol),
+            theme=spec.theme,
+            user_factor=spec.user_factor or str(factor_blend["user_factor"]["hypothesis"]),
+            candidate_symbols=spec.candidate_symbols,
+        )
         st.session_state.backtest_spec = chosen
         st.session_state.backtest_result = run_backtest_from_spec(chosen)
         st.session_state.backtest_result["factor_blend"] = factor_blend
@@ -1250,6 +1299,10 @@ def render_backtest_panel(template: InterviewTemplate, answers: dict[str, str]) 
         """,
         unsafe_allow_html=True,
     )
+    candidate_pool = result.get("candidate_pool")
+    if candidate_pool is not None and not candidate_pool.empty and len(candidate_pool) > 1:
+        st.markdown("##### 候选池横向比较")
+        st.dataframe(_format_candidate_table(candidate_pool), hide_index=True, use_container_width=True)
     st.markdown("##### \u65b9\u6848\u660e\u7ec6")
     st.dataframe(_format_summary_table(summary), hide_index=True, use_container_width=True)
     st.line_chart(curves)

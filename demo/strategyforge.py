@@ -322,15 +322,39 @@ def summarize_backtest(bt: pd.DataFrame) -> dict[str, float | int]:
     total_return = float(bt["equity"].iloc[-1] - 1)
     benchmark_return = float(bt["benchmark_equity"].iloc[-1] - 1)
     daily = bt["strategy_return"]
+    benchmark_daily = bt["return"]
     wins = daily[daily != 0] > 0
+    active = daily[daily != 0]
+    gains = active[active > 0]
+    losses = active[active < 0]
+    periods = max(len(bt), 1)
+    annual_return = float(bt["equity"].iloc[-1] ** (252 / periods) - 1) if periods > 0 else 0.0
+    annual_volatility = float(daily.std() * np.sqrt(252)) if not np.isnan(daily.std()) else 0.0
+    excess_daily = daily - benchmark_daily
+    tracking_error = excess_daily.std()
+    information_ratio = float((excess_daily.mean() / tracking_error) * np.sqrt(252)) if tracking_error and not np.isnan(tracking_error) else 0.0
+    profit_loss_ratio = float(gains.mean() / abs(losses.mean())) if len(gains) and len(losses) and losses.mean() != 0 else 0.0
+    losing_streak = 0
+    max_losing_streak = 0
+    for value in active:
+        if value < 0:
+            losing_streak += 1
+            max_losing_streak = max(max_losing_streak, losing_streak)
+        else:
+            losing_streak = 0
     return {
         "累计收益": total_return,
         "基准收益": benchmark_return,
         "超额收益": total_return - benchmark_return,
+        "年化收益": annual_return,
+        "年化波动": annual_volatility,
         "最大回撤": max_drawdown(bt["equity"]),
         "夏普比率": sharpe_ratio(daily),
+        "信息比率": information_ratio,
         "交易次数": int(bt["trade"].sum()),
         "胜率": float(wins.mean()) if len(wins) else 0.0,
+        "盈亏比": profit_loss_ratio,
+        "最大连续亏损": int(max_losing_streak),
         "持仓天数占比": float((bt["position"] > 0).mean()),
     }
 
