@@ -8,11 +8,9 @@ from typing import Any
 try:
     from interview_agent import StrategyPrototype
     from strategyforge import RiskProfile, StrategyFamily
-    from strategy_registry import registry, CATEGORY_FAMILY_MAP, StrategyDefinition
 except ModuleNotFoundError:
     from .interview_agent import StrategyPrototype
     from .strategyforge import RiskProfile, StrategyFamily
-    from .strategy_registry import registry, CATEGORY_FAMILY_MAP, StrategyDefinition
 
 
 FACTOR_LIBRARY_PATH = Path(__file__).resolve().parent / "factor_library.json"
@@ -46,32 +44,64 @@ class FactorBlend:
     reason: str
 
 
+DEFAULT_BASE_FACTORS: tuple[BaseFactor, ...] = (
+    BaseFactor(
+        id="trend_ma_20_60",
+        name="20/60 日均线趋势",
+        family="趋势跟踪",
+        description="用 20 日均线和 60 日均线判断中短期趋势。",
+        default_risk="均衡",
+        enhanced=True,
+        tags=("趋势", "均线", "动量", "中期"),
+    ),
+    BaseFactor(
+        id="rsi_reversal_14",
+        name="RSI 超跌修复",
+        family="均值回归",
+        description="用 RSI 识别短期超跌后的修复机会。",
+        default_risk="均衡",
+        enhanced=True,
+        tags=("反转", "RSI", "超跌", "短期"),
+    ),
+    BaseFactor(
+        id="bollinger_reversion_20",
+        name="20 日布林带边界",
+        family="布林带反转",
+        description="用价格偏离正常波动区间来捕捉修复机会。",
+        default_risk="均衡",
+        enhanced=True,
+        tags=("布林带", "波动", "反转", "短期"),
+    ),
+    BaseFactor(
+        id="multi_signal_vote",
+        name="趋势/RSI/布林带投票",
+        family="多策略投票",
+        description="多个基础信号同时确认后才入场，降低单一信号误判。",
+        default_risk="保守",
+        enhanced=True,
+        tags=("多策略", "确认", "稳健", "组合"),
+    ),
+)
+
+
 def load_base_factors(path: Path = FACTOR_LIBRARY_PATH) -> list[BaseFactor]:
-    """从策略注册中心加载因子（优先），回退到旧 JSON 文件。"""
-    definitions = registry.all()
-    if definitions:
-        return [_definition_to_base_factor(d) for d in definitions]
-    # 回退：旧格式
     if not path.exists():
-        return []
+        return list(DEFAULT_BASE_FACTORS)
     payload = json.loads(path.read_text(encoding="utf-8"))
     factors: list[BaseFactor] = []
     for item in payload.get("factors", []):
-        factors.append(BaseFactor(
-            id=str(item["id"]), name=str(item["name"]),
-            family=item["family"], description=str(item.get("description") or ""),
-            default_risk=item.get("default_risk") or "均衡",
-            enhanced=bool(item.get("enhanced", True)),
-            tags=tuple(str(tag) for tag in item.get("tags", [])),
-        ))
-    return factors
-
-
-def _definition_to_base_factor(d: StrategyDefinition) -> BaseFactor:
-    return BaseFactor(
-        id=d.id, name=d.name, family=CATEGORY_FAMILY_MAP.get(d.category, "基础模板"),
-        description=d.description, default_risk=d.risk, enhanced=True, tags=d.tags,
-    )
+        factors.append(
+            BaseFactor(
+                id=str(item["id"]),
+                name=str(item["name"]),
+                family=item["family"],
+                description=str(item.get("description") or ""),
+                default_risk=item.get("default_risk") or "均衡",
+                enhanced=bool(item.get("enhanced", True)),
+                tags=tuple(str(tag) for tag in item.get("tags", [])),
+            )
+        )
+    return factors or list(DEFAULT_BASE_FACTORS)
 
 
 def user_factor_from_prototype(prototype: StrategyPrototype, answers: dict[str, str]) -> UserFactor:
@@ -140,46 +170,3 @@ def factor_blend_payload(prototype: StrategyPrototype, answers: dict[str, str]) 
         "user_weight": blend.user_weight,
         "reason": blend.reason,
     }
-
-
-def suggest_strategies(keywords: str | None = None, risk: str | None = None,
-                        category: str | None = None, limit: int = 5) -> list[dict[str, Any]]:
-    """根据关键词、风险偏好、分类推荐策略。
-
-    这是 Agent 调用策略库的入口。
-    用户说"我想做趋势" → suggest_strategies(keywords="趋势") → 返回匹配策略列表。
-    """
-    candidates = registry.all()
-
-    if category:
-        candidates = registry.by_category(category)
-    if risk:
-        candidates = [s for s in candidates if s.risk == risk]
-    if keywords:
-        scored = []
-        kw_lower = keywords.lower()
-        for s in candidates:
-            score = 0
-            text = f"{s.name} {s.description} {' '.join(s.tags)}"
-            score += sum(1 for tag in s.tags if tag.lower() in kw_lower)
-            score += (2 if kw_lower in s.name.lower() else 0)
-            score += (1 if kw_lower in s.description.lower() else 0)
-            scored.append((score, s))
-        scored.sort(key=lambda x: x[0], reverse=True)
-        candidates = [s for _, s in scored if _ > 0]
-
-    return [s.to_dict() for s in candidates[:limit]]
-
-
-def get_all_strategies() -> list[dict[str, Any]]:
-    """返回策略库全部策略的摘要。供前端展示策略选择器。"""
-    return [s.to_dict() for s in registry.all()]
-
-
-def get_categories() -> list[dict[str, Any]]:
-    """返回策略分类列表。供前端渲染分类导航。"""
-    return [
-        {"id": c.id, "name": c.name, "description": c.description, "icon": c.icon,
-         "count": len(registry.by_category(c.id))}
-        for c in registry.categories()
-    ]

@@ -1,0 +1,330 @@
+{
+  "version": "2.0.0",
+  "description": "智塔 Strata 策略库 — 7 大类 30+ 策略，JSON 驱动，不改代码即可扩充",
+
+  "categories": [
+    {
+      "id": "trend_following",
+      "name": "趋势跟踪",
+      "description": "顺势而为：价格形成趋势后跟随入场，趋势反转时退出",
+      "icon": "trending_up"
+    },
+    {
+      "id": "mean_reversion",
+      "name": "均值回归",
+      "description": "逆向操作：价格偏离均值时反向入场，回归均值时退出",
+      "icon": "swap_horiz"
+    },
+    {
+      "id": "volatility",
+      "name": "波动率策略",
+      "description": "以波动率为核心信号：低波动突破、高波动反转、波动率套利",
+      "icon": "show_chart"
+    },
+    {
+      "id": "momentum",
+      "name": "动量策略",
+      "description": "强者恒强：买入近期表现强势的资产，卖出弱势资产",
+      "icon": "rocket_launch"
+    },
+    {
+      "id": "multi_factor",
+      "name": "多因子合成",
+      "description": "多信号交叉验证：投票机制、加权合成、动态因子轮动",
+      "icon": "account_tree"
+    },
+    {
+      "id": "benchmark_relative",
+      "name": "基准线相对",
+      "description": "以基准指数为参照：超额收益追踪、择时配对、对冲策略",
+      "icon": "align_horizontal_left"
+    },
+    {
+      "id": "alternative",
+      "name": "另类数据 / 外部因子",
+      "description": "非传统数据驱动的策略：基本面、情绪、宏观、另类数据因子注入",
+      "icon": "satellite_alt"
+    }
+  ],
+
+  "strategies": [
+    {
+      "id": "trend_ma_cross",
+      "category": "trend_following",
+      "name": "双均线交叉",
+      "description": "短期均线上穿长期均线买入，下穿卖出。经典趋势跟踪策略。",
+      "risk": "均衡",
+      "engine": "native",
+      "tags": ["趋势", "均线", "金叉", "死叉", "中期"],
+      "params": {"ma_fast": 20, "ma_slow": 60},
+      "source": "classic",
+      "reference": "Brock, Lakonishok, LeBaron (1992)"
+    },
+    {
+      "id": "trend_ma_triple",
+      "category": "trend_following",
+      "name": "三均线系统",
+      "description": "快中慢三条均线多头排列时持仓，空头排列时空仓",
+      "risk": "均衡",
+      "engine": "native",
+      "tags": ["趋势", "均线", "排列", "中期"],
+      "params": {"ma_fast": 10, "ma_mid": 30, "ma_slow": 60},
+      "source": "extension"
+    },
+    {
+      "id": "trend_channel_breakout",
+      "category": "trend_following",
+      "name": "通道突破",
+      "description": "价格突破 N 日高点时入场，跌破 N 日低点时退出。海龟交易法则核心。",
+      "risk": "进取",
+      "engine": "native",
+      "tags": ["趋势", "突破", "通道", "海龟"],
+      "params": {"lookback": 20, "atr_period": 14},
+      "source": "classic",
+      "reference": "Donchian Channel; Turtle Trading Rules"
+    },
+    {
+      "id": "trend_macd",
+      "category": "trend_following",
+      "name": "MACD 趋势信号",
+      "description": "MACD 金叉买入，死叉卖出。用 DIF/DEA/柱状图确认趋势方向。",
+      "risk": "均衡",
+      "engine": "native",
+      "tags": ["趋势", "MACD", "动量", "中期"],
+      "params": {"macd_fast": 12, "macd_slow": 26, "macd_signal": 9},
+      "source": "classic"
+    },
+    {
+      "id": "trend_adx",
+      "category": "trend_following",
+      "name": "ADX 趋势强度过滤",
+      "description": "ADX>25 确认趋势存在时，顺均线方向入场；ADX<20 趋势不明时空仓",
+      "risk": "保守",
+      "engine": "native",
+      "tags": ["趋势", "ADX", "过滤", "强度"],
+      "params": {"adx_period": 14, "adx_threshold": 25},
+      "source": "classic",
+      "reference": "Wilder's DMI/ADX"
+    },
+
+    {
+      "id": "reversal_rsi",
+      "category": "mean_reversion",
+      "name": "RSI 超卖反弹",
+      "description": "RSI 跌破超卖线时入场博反弹，回到中轴或超买线时退出",
+      "risk": "均衡",
+      "engine": "native",
+      "tags": ["反转", "RSI", "超卖", "短期"],
+      "params": {"rsi_period": 14, "oversold": 30, "overbought": 70, "exit_level": 55},
+      "source": "classic"
+    },
+    {
+      "id": "reversal_bollinger",
+      "category": "mean_reversion",
+      "name": "布林带回归",
+      "description": "价格跌破下轨入场，回到中轨或触及上轨退出。捕捉短期偏离后的修复。",
+      "risk": "均衡",
+      "engine": "native",
+      "tags": ["布林带", "波动", "回归", "短期"],
+      "params": {"bb_period": 20, "bb_std": 2.0},
+      "source": "classic"
+    },
+    {
+      "id": "reversal_keltner",
+      "category": "mean_reversion",
+      "name": "肯特纳通道回归",
+      "description": "价格突破 Keltner 通道边界后反向入场，回归中轨退出。ATR 自适应宽度。",
+      "risk": "均衡",
+      "engine": "native",
+      "tags": ["肯特纳", "ATR", "回归", "均值"],
+      "params": {"kc_period": 20, "kc_multiplier": 1.5},
+      "source": "extension"
+    },
+    {
+      "id": "reversal_stoch",
+      "category": "mean_reversion",
+      "name": "随机指标超卖反弹",
+      "description": "%K/%D 双线在超卖区金叉入场，在超买区死叉退出",
+      "risk": "保守",
+      "engine": "native",
+      "tags": ["随机", "KDJ", "超卖", "反转"],
+      "params": {"stoch_k": 14, "stoch_d": 3, "oversold": 20, "overbought": 80},
+      "source": "classic"
+    },
+
+    {
+      "id": "vol_breakout",
+      "category": "volatility",
+      "name": "波动率突破",
+      "description": "当波动率（ATR/历史波动率）从低位突破阈值时入场，波动率回落时退出",
+      "risk": "进取",
+      "engine": "native",
+      "tags": ["波动率", "突破", "ATR", "择时"],
+      "params": {"vol_period": 20, "vol_threshold": 1.5},
+      "source": "extension"
+    },
+    {
+      "id": "vol_targeting",
+      "category": "volatility",
+      "name": "波动率目标仓位",
+      "description": "根据当前波动率动态调整仓位大小，使组合波动率维持恒定水平",
+      "risk": "保守",
+      "engine": "native",
+      "tags": ["波动率", "仓位管理", "风控", "自适应"],
+      "params": {"target_vol": 0.15, "vol_period": 60},
+      "source": "extension",
+      "reference": "Moreira & Muir (2017)"
+    },
+    {
+      "id": "vol_regime",
+      "category": "volatility",
+      "name": "波动率区间择时",
+      "description": "低波动区间做趋势，高波动区间做反转，利用波动率区间的策略切换",
+      "risk": "均衡",
+      "engine": "vbt",
+      "tags": ["波动率", "区间", "切换", "自适应"],
+      "params": {"vol_period": 20, "low_vol_pct": 25, "high_vol_pct": 75},
+      "source": "research"
+    },
+
+    {
+      "id": "mom_time_series",
+      "category": "momentum",
+      "name": "时间序列动量",
+      "description": "过去 N 个月收益为正则做多，为负则做空/空仓。Moskowitz et al. 经典策略。",
+      "risk": "进取",
+      "engine": "native",
+      "tags": ["动量", "时序", "绝对收益", "趋势强度"],
+      "params": {"lookback": 252, "skip_recent": 21},
+      "source": "classic",
+      "reference": "Moskowitz, Ooi, Pedersen (2012)"
+    },
+    {
+      "id": "mom_cross_sectional",
+      "category": "momentum",
+      "name": "截面动量轮动",
+      "description": "在多标的间选择过去 N 日收益最强的 top-K 个做多，定期再平衡",
+      "risk": "进取",
+      "engine": "vbt",
+      "tags": ["动量", "截面", "轮动", "排名"],
+      "params": {"lookback": 60, "top_k": 3, "rebalance": 20},
+      "source": "classic",
+      "reference": "Jegadeesh & Titman (1993)"
+    },
+    {
+      "id": "mom_dual",
+      "category": "momentum",
+      "name": "双动量策略",
+      "description": "绝对动量（相对于无风险收益）+ 相对动量（相对于同类资产），双条件确认入场",
+      "risk": "均衡",
+      "engine": "native",
+      "tags": ["动量", "绝对", "相对", "双确认"],
+      "params": {"lookback": 252, "rf_proxy": "510300"},
+      "source": "classic",
+      "reference": "Antonacci 'Dual Momentum'"
+    },
+
+    {
+      "id": "multi_vote_3",
+      "category": "multi_factor",
+      "name": "三信号投票",
+      "description": "趋势（均线）+ RSI + 布林带，至少 2 个确认时入场，1 个或 0 个确认时退出",
+      "risk": "均衡",
+      "engine": "native",
+      "tags": ["多策略", "投票", "确认", "稳健"],
+      "params": {"vote_threshold": 2},
+      "source": "custom"
+    },
+    {
+      "id": "multi_weighted",
+      "category": "multi_factor",
+      "name": "加权信号合成",
+      "description": "多个子信号加权求和，超过阈值入场。权重可根据近期表现动态调整。",
+      "risk": "均衡",
+      "engine": "vbt",
+      "tags": ["多因子", "加权", "合成", "自适应"],
+      "params": {"signal_count": 4, "entry_threshold": 0.5, "weights": [0.3, 0.3, 0.2, 0.2]},
+      "source": "research"
+    },
+    {
+      "id": "multi_rotation",
+      "category": "multi_factor",
+      "name": "动态因子轮动",
+      "description": "根据市场状态（趋势/震荡/高波/低波）自动切换最优策略族",
+      "risk": "进取",
+      "engine": "vbt",
+      "tags": ["因子轮动", "市场状态", "自适应", "择时"],
+      "params": {"regime_lookback": 60, "candidates": ["trend_ma_cross", "reversal_rsi", "vol_breakout"]},
+      "source": "research"
+    },
+
+    {
+      "id": "bm_zscore",
+      "category": "benchmark_relative",
+      "name": "基准 Z-score 偏离",
+      "description": "标的/基准比值的 Z-score 超过阈值时入场，回落时退出",
+      "risk": "均衡",
+      "engine": "vbt",
+      "tags": ["基准线", "Z-score", "相对强度", "偏离"],
+      "params": {"lookback": 60, "entry_zscore": 1.5, "exit_zscore": 0.5},
+      "source": "custom"
+    },
+    {
+      "id": "bm_relative_ma",
+      "category": "benchmark_relative",
+      "name": "相对均线交叉",
+      "description": "标的/基准比值上穿均线时入场，下穿时退出",
+      "risk": "均衡",
+      "engine": "vbt",
+      "tags": ["基准线", "相对强度", "均线交叉"],
+      "params": {"ma_fast": 20, "ma_slow": 60},
+      "source": "custom"
+    },
+    {
+      "id": "bm_pairs",
+      "category": "benchmark_relative",
+      "name": "配对交易模板",
+      "description": "两个高相关性标的的价差偏离均值时，做多弱者做空强者，价差回归时平仓",
+      "risk": "保守",
+      "engine": "vbt",
+      "tags": ["配对交易", "协整", "价差", "对冲"],
+      "params": {"lookback": 120, "entry_std": 2.0, "exit_std": 0.5, "pair": null},
+      "source": "classic",
+      "reference": "Gatev, Goetzmann, Rouwenhorst (2006)"
+    },
+
+    {
+      "id": "alt_fundamental",
+      "category": "alternative",
+      "name": "基本面因子入口",
+      "description": "从 PE/PB/ROE/营收增速等基本面数据构建多空信号",
+      "risk": "均衡",
+      "engine": "vbt",
+      "tags": ["基本面", "估值", "质量", "外部"],
+      "params": {"factor_source": "csv", "entry_threshold": 0.0, "long_only": true},
+      "source": "external"
+    },
+    {
+      "id": "alt_sentiment",
+      "category": "alternative",
+      "name": "情绪/新闻因子入口",
+      "description": "从新闻情绪、社交媒体、分析师报告等文本数据提取交易信号",
+      "risk": "进取",
+      "engine": "vbt",
+      "tags": ["情绪", "NLP", "新闻", "外部"],
+      "params": {"factor_source": "csv", "sentiment_threshold": 0.3},
+      "source": "external"
+    },
+    {
+      "id": "alt_macro",
+      "category": "alternative",
+      "name": "宏观择时因子",
+      "description": "根据利率、CPI、PMI 等宏观指标决定仓位方向和大小",
+      "risk": "保守",
+      "engine": "vbt",
+      "tags": ["宏观", "利率", "通胀", "择时"],
+      "params": {"factor_source": "csv", "macro_lookback": 60},
+      "source": "external"
+    }
+  ]
+}

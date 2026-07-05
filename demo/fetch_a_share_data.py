@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import csv
 import json
-import os
 import sys
 import urllib.parse
 import urllib.request
@@ -10,8 +9,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-WORKSPACE_ROOT = Path(__file__).resolve().parents[2]
-DATASET_DIR = Path(os.getenv("STRATA_DATASET_DIR", WORKSPACE_ROOT / "local_data" / "DATASET"))
+ROOT = Path(__file__).resolve().parents[1]
+DATASET_DIR = ROOT / "DATASET"
 
 
 @dataclass(frozen=True)

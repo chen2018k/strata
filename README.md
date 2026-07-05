@@ -66,3 +66,11 @@ GitHub 只保存 `data/` 下的数据源说明，不保存本地 CSV、数据库
 - 代码、产品文档、接口模板可以提交
 - API key、本地数据、大型压缩包、临时 tunnel 工具不会提交
 - 每次加入关键 feature 后，可以提交一个清晰版本
+
+保存本地版本：
+
+```powershell
+.\scripts\save_version.ps1 -Message "feat: describe the feature"
+```
+
+配置远程仓库后可以追加 `-Push`。

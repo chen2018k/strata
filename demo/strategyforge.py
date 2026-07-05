@@ -10,8 +10,20 @@ import numpy as np
 import pandas as pd
 
 
-WORKSPACE_ROOT = Path(__file__).resolve().parents[2]
-DATASET_DIR = Path(os.getenv("STRATA_DATASET_DIR", WORKSPACE_ROOT / "local_data" / "DATASET"))
+def _default_dataset_dir() -> Path:
+    env_path = os.getenv("STRATA_DATASET_DIR")
+    if env_path:
+        return Path(env_path)
+
+    current = Path(__file__).resolve()
+    for parent in current.parents:
+        candidate = parent / "local_data" / "DATASET"
+        if (candidate / "metadata.json").exists():
+            return candidate
+    return current.parent / "DATASET"
+
+
+DATASET_DIR = _default_dataset_dir()
 
 RiskProfile = Literal["保守", "均衡", "进取"]
 StrategyFamily = Literal["趋势跟踪", "均值回归", "布林带反转", "多策略投票", "基础模板"]

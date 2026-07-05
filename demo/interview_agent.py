@@ -289,7 +289,15 @@ def generate_strategy_prototype(
     def list_field(name: str, fallback_values: tuple[str, ...]) -> tuple[str, ...]:
         value = raw.get(name)
         if isinstance(value, list):
-            return tuple(str(item) for item in value if str(item).strip())
+            items: list[str] = []
+            for item in value:
+                if isinstance(item, dict):
+                    text = item.get("question") or item.get("prompt") or item.get("text") or item.get("title")
+                else:
+                    text = item
+                if str(text).strip():
+                    items.append(str(text).strip())
+            return tuple(items)
         if isinstance(value, str) and value.strip():
             return (value.strip(),)
         return fallback_values

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智塔 Strata · 策略塔台</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f6f5f2; --surface: #fff; --ink: #1a1a1a; --muted: #888;
+    --line: #e8e6e0; --accent: #111; --danger: #d64040; --ok: #1f8b4c;
+    --warn: #e8a020; --blue: #2864dc;
+    --radius: 10px; --radius-sm: 6px;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--ink); min-height: 100vh;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 3rem 1rem 4rem;
+  }
+  .container { width: 100%; max-width: 720px; }
+
+  .brand { text-align: center; margin-bottom: 1.4rem; }
+  .brand h1 { font-size: 1.4rem; font-weight: 700; }
+  .brand p { color: var(--muted); font-size: .88rem; margin-top: .15rem; }
+
+  .card { background: var(--surface); border-radius: var(--radius);
+    box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.04);
+    padding: 1.8rem; margin-bottom: 1rem; }
+
+  .tabs { display: flex; gap: 0; margin-bottom: 1.4rem; border-bottom: 1px solid var(--line); }
+  .tab-btn { flex: 1; padding: .55rem 0; border: none; background: none; cursor: pointer;
+    font-size: .9rem; font-weight: 600; color: var(--muted);
+    border-bottom: 2px solid transparent; transition: all .15s; }
+  .tab-btn.active { color: var(--ink); border-bottom-color: var(--ink); }
+
+  .field { margin-bottom: .9rem; }
+  .field label { display: block; font-size: .78rem; font-weight: 600; margin-bottom: .25rem; }
+  .field input { width: 100%; padding: .6rem .7rem; border: 1px solid var(--line);
+    border-radius: var(--radius-sm); font-size: .88rem; outline: none;
+    background: #fafaf9; transition: border .15s; }
+  .field input:focus { border-color: var(--ink); background: #fff; }
+  .hint { font-size: .7rem; color: var(--muted); margin-top: .15rem; }
+
+  .code-row { display: flex; gap: .4rem; }
+  .code-row input { flex: 1; }
+  .code-row button { white-space: nowrap; padding: .6rem .8rem; border: 1px solid var(--ink);
+    background: var(--ink); color: #fff; border-radius: var(--radius-sm);
+    font-size: .78rem; font-weight: 600; cursor: pointer; }
+  .code-row button:disabled { opacity: .4; cursor: not-allowed; }
+  .code-row button.sent { background: var(--ok); border-color: var(--ok); }
+
+  .btn-primary { width: 100%; padding: .65rem; border: none; border-radius: var(--radius-sm);
+    background: var(--ink); color: #fff; font-size: .88rem; font-weight: 700;
+    cursor: pointer; margin-top: .2rem; }
+  .btn-primary:hover { opacity: .9; }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+
+  .btn-sm { padding: .3rem .65rem; border-radius: var(--radius-sm); font-size: .74rem;
+    font-weight: 600; cursor: pointer; border: 1px solid var(--line); background: #fff; }
+  .btn-sm:hover { border-color: var(--ink); }
+  .btn-sm.danger { color: var(--danger); border-color: #fcc; }
+  .btn-sm.danger:hover { background: #fff5f5; border-color: var(--danger); }
+  .btn-sm.play { color: var(--ok); border-color: #b7e8c7; font-size: .8rem; }
+  .btn-sm.play:hover { background: #f0fcf2; border-color: var(--ok); }
+  .btn-sm.running { color: var(--warn); border-color: #fce4a8; animation: pulse 1.2s infinite; }
+
+  .msg { font-size: .78rem; padding: .5rem .65rem; border-radius: var(--radius-sm);
+    margin-bottom: .7rem; display: none; }
+  .msg.error { background: #fff5f5; color: var(--danger); border: 1px solid #ffc9c9; display: block; }
+  .msg.success { background: #f0fcf2; color: var(--ok); border: 1px solid #b2f2bb; display: block; }
+
+  .status { margin-top: 1rem; padding: .55rem .75rem; border-radius: var(--radius-sm);
+    background: #f0ede7; font-size: .74rem; display: flex; align-items: center; gap: .4rem; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+  .dot.off { background: #ccc; }
+
+  .footer-links { text-align: center; margin-top: 1.2rem; }
+  .footer-links span { color: var(--muted); font-size: .74rem; cursor: pointer; }
+  .footer-links span:hover { text-decoration: underline; }
+
+  .user-info { display: flex; align-items: center; gap: .7rem; margin-bottom: 1.2rem; }
+  .user-info .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--ink);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1rem; flex-shrink: 0; }
+  .user-info .meta { flex: 1; }
+  .user-info .meta strong { display: block; font-size: .92rem; }
+  .user-info .meta span { font-size: .74rem; color: var(--muted); }
+
+  .section-header { display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: .8rem; }
+  .section-header h3 { font-size: .95rem; font-weight: 700; }
+
+  .record-list { display: grid; gap: .55rem; }
+  .record-card { border: 1px solid var(--line); border-radius: var(--radius);
+    padding: .9rem 1rem; background: #fcfcfb; transition: border .15s, box-shadow .15s; }
+  .record-card:hover { border-color: #ccc; box-shadow: 0 2px 8px rgba(0,0,0,.03); }
+  .record-card.running { border-color: var(--warn); background: #fffdf5; }
+
+  .record-top { display: flex; align-items: flex-start; justify-content: space-between;
+    gap: .6rem; margin-bottom: .45rem; }
+  .record-name { font-weight: 700; font-size: .88rem; flex: 1; word-break: break-word; }
+  .record-name input { font-size: .88rem; font-weight: 700; border: 1px solid var(--ink);
+    border-radius: var(--radius-sm); padding: .15rem .35rem; width: 100%; }
+
+  .record-meta { display: flex; flex-wrap: wrap; gap: .3rem .7rem; font-size: .74rem; color: var(--muted);
+    margin-bottom: .4rem; }
+  .record-meta span { white-space: nowrap; }
+
+  .record-stats { display: flex; gap: .8rem; font-size: .76rem; margin-bottom: .45rem; }
+  .record-stats .val { font-weight: 700; }
+  .record-stats .pos { color: var(--ok); }
+  .record-stats .neg { color: var(--danger); }
+
+  .record-actions { display: flex; gap: .35rem; align-items: center; }
+
+  .badge { display: inline-block; padding: .12rem .45rem; border-radius: 999px;
+    font-size: .68rem; font-weight: 700; }
+  .badge.completed { background: #eef7ee; color: var(--ok); }
+  .badge.running { background: #fff8e8; color: var(--warn); }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+  @media (max-width: 500px) {
+    .record-top { flex-direction: column; }
+    .record-stats { flex-wrap: wrap; gap: .4rem; }
+  }
+
+  /* inline edit modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.3);
+    display: flex; align-items: center; justify-content: center; z-index: 100; }
+  .modal-box { background: #fff; border-radius: var(--radius); padding: 1.5rem;
+    width: min(400px, 90vw); box-shadow: 0 8px 40px rgba(0,0,0,.15); }
+  .modal-box h4 { margin-bottom: .8rem; }
+  .modal-box .field { margin-bottom: .7rem; }
+  .modal-actions { display: flex; gap: .4rem; justify-content: flex-end; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="brand"><h1>智塔 Strata</h1><p>策略回测记录管理</p></div>
+
+  <div class="card">
+    <div class="msg" id="msg"></div>
+
+    <!-- auth forms -->
+    <div class="tabs" id="tabs">
+      <button class="tab-btn active" data-tab="login">登录</button>
+      <button class="tab-btn" data-tab="register">注册</button>
+    </div>
+
+    <form id="loginForm" autocomplete="off">
+      <div class="field"><label>用户名 / 邮箱</label><input type="text" id="loginUser" placeholder="输入用户名或邮箱" required></div>
+      <div class="field"><label>密码</label><input type="password" id="loginPass" placeholder="输入密码" required></div>
+      <button type="submit" class="btn-primary">登 录</button>
+    </form>
+
+    <form id="registerForm" style="display:none" autocomplete="off">
+      <div class="field"><label>用户名</label><input type="text" id="regUser" placeholder="至少2个字符" required></div>
+      <div class="field"><label>邮箱</label><input type="email" id="regEmail" placeholder="your@email.com" required><span class="hint">用于接收验证码</span></div>
+      <div class="field"><label>验证码</label><div class="code-row"><input type="text" id="regCode" placeholder="6位数字" maxlength="6" required><button type="button" id="sendCodeBtn">获取验证码</button></div></div>
+      <div class="field"><label>密码</label><input type="password" id="regPass" placeholder="至少6个字符" required></div>
+      <button type="submit" class="btn-primary" id="regSubmit">注 册</button>
+    </form>
+
+    <!-- logged-in dashboard -->
+    <div id="loggedInView" style="display:none">
+      <div class="user-info">
+        <div class="avatar" id="userAvatar">S</div>
+        <div class="meta"><strong id="userName">—</strong><span id="userEmail">—</span></div>
+        <button class="btn-sm danger" onclick="handleLogout()">退出</button>
+      </div>
+      <div class="section-header"><h3>回测记录</h3><span style="font-size:.74rem;color:var(--muted)" id="recordCount">—</span></div>
+      <div class="record-list" id="recordList"></div>
+    </div>
+  </div>
+
+  <div class="status"><span class="dot" id="statusDot"></span><span id="statusText">服务连接中...</span></div>
+  <div class="footer-links"><span onclick="showMsg('success','智塔 Strata v2.0 · 策略回测记录管理')">关于智塔</span></div>
+</div>
+
+<!-- rename modal -->
+<div class="modal-overlay" id="renameModal" style="display:none">
+  <div class="modal-box">
+    <h4>修改记录</h4>
+    <div class="field"><label>名称</label><input type="text" id="renameName"></div>
+    <div class="field"><label>备注</label><input type="text" id="renameNotes"></div>
+    <div class="modal-actions">
+      <button class="btn-sm" onclick="closeRename()">取消</button>
+      <button class="btn-sm play" id="renameSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+{% raw %}
+const API = '';
+let currentTab = 'login', codeTimer = null, currentRid = null;
+
+const $ = s => document.querySelector(s);
+const showMsg = (type, text) => {
+  const m = $('#msg'); m.className = 'msg ' + type; m.textContent = text; m.style.display = 'block';
+  setTimeout(() => { m.style.display = 'none'; }, 4000);
+};
+const api = async (url, opts={}) => {
+  const r = await fetch(API + url, {
+    method: opts.method || 'GET',
+    headers: {'Content-Type':'application/json', ...opts.headers},
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+  });
+  const data = await r.json();
+  if (!r.ok) throw new Error(data.error || '请求失败');
+  return data;
+};
+const setStatus = (ok, text) => { $('#statusDot').className = 'dot' + (ok ? '' : ' off'); $('#statusText').textContent = text; };
+
+const fmtPct = v => (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%';
+const clsPct = v => v >= 0 ? 'val pos' : 'val neg';
+const badge = s => `<span class="badge ${s}">${{completed:'已完成',running:'运行中',stopped:'已停止'}[s] || s}</span>`;
+
+// ── auth check ────────────────────────────────────────────
+(async () => {
+  try { const { user } = await api('/api/auth/me'); showDashboard(user); setStatus(true, '已连接 · '+user.username); }
+  catch { setStatus(true, '已连接 · 请登录'); }
+})();
+
+// ── tabs ──────────────────────────────────────────────────
+$('#tabs').addEventListener('click', e => {
+  if (!e.target.classList.contains('tab-btn')) return;
+  currentTab = e.target.dataset.tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  $('#loginForm').style.display = currentTab === 'login' ? '' : 'none';
+  $('#registerForm').style.display = currentTab === 'register' ? '' : 'none';
+  $('#loggedInView').style.display = 'none'; $('#msg').style.display = 'none';
+});
+
+// ── send code ─────────────────────────────────────────────
+$('#sendCodeBtn').addEventListener('click', async () => {
+  const email = $('#regEmail').value.trim();
+  if (!email.includes('@')) { showMsg('error','请输入正确邮箱'); return; }
+  const btn = $('#sendCodeBtn'); btn.disabled = true; btn.textContent = '发送中...';
+  try {
+    const d = await api('/api/auth/send-code', {method:'POST',body:{target:email}});
+    showMsg('success', `验证码: ${d.code_hint}（开发模式直接显示）`);
+    btn.classList.add('sent'); btn.textContent = '已发送'; let s = 60;
+    codeTimer = setInterval(() => { if(s<=0){clearInterval(codeTimer);btn.disabled=false;btn.classList.remove('sent');btn.textContent='重新获取';return;} s--;btn.textContent=s+'s'; }, 1000);
+  } catch(e) { showMsg('error',e.message); btn.disabled=false; btn.textContent='获取验证码'; }
+});
+
+// ── register ──────────────────────────────────────────────
+$('#registerForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = $('#regSubmit'); btn.disabled = true; btn.textContent = '注册中...';
+  try {
+    const d = await api('/api/auth/verify-and-register', {method:'POST', body:{
+      target: $('#regEmail').value.trim(), code: $('#regCode').value.trim(),
+      username: $('#regUser').value.trim(), password: $('#regPass').value.trim() }});
+    showMsg('success','注册成功！'); if(codeTimer){clearInterval(codeTimer);$('#sendCodeBtn').disabled=false;$('#sendCodeBtn').textContent='获取验证码';}
+    showDashboard(d.user); setStatus(true,'已登录 · '+d.user.username);
+  } catch(e) { showMsg('error',e.message); }
+  finally { btn.disabled=false; btn.textContent='注 册'; }
+});
+
+// ── login ─────────────────────────────────────────────────
+$('#loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  try {
+    const d = await api('/api/auth/login', {method:'POST', body:{username:$('#loginUser').value.trim(), password:$('#loginPass').value.trim()}});
+    showDashboard(d.user); setStatus(true,'已登录 · '+d.user.username);
+  } catch(e) { showMsg('error',e.message); }
+});
+
+async function handleLogout() {
+  try { await api('/api/auth/logout', {method:'POST'}); showLoggedOut(); showMsg('success','已退出'); setStatus(true,'已连接'); }
+  catch(e) { showMsg('error',e.message); }
+}
+
+// ── dashboard ─────────────────────────────────────────────
+async function showDashboard(user) {
+  $('#loginForm').style.display = 'none'; $('#registerForm').style.display = 'none';
+  $('#loggedInView').style.display = ''; $('#tabs').style.display = 'none';
+  $('#userAvatar').textContent = (user.username||'S')[0].toUpperCase();
+  $('#userName').textContent = user.username; $('#userEmail').textContent = user.email;
+  await loadRecords();
+}
+
+function showLoggedOut() {
+  $('#loggedInView').style.display = 'none'; $('#tabs').style.display = '';
+  $('#loginForm').style.display = currentTab==='register' ? 'none' : '';
+  $('#registerForm').style.display = currentTab==='register' ? '' : 'none';
+}
+
+async function loadRecords() {
+  try {
+    const { records } = await api('/api/records');
+    $('#recordCount').textContent = records.length + ' 条记录';
+    const list = $('#recordList');
+    list.innerHTML = records.map(r => `
+      <div class="record-card ${r.status==='running'?'running':''}">
+        <div class="record-top">
+          <div class="record-name" id="rname-${r.id}">${esc(r.name)}</div>
+          <div style="flex-shrink:0">${badge(r.status)}</div>
+        </div>
+        <div class="record-meta">
+          <span>${r.symbol} ${r.symbol_name}</span><span>·</span>
+          <span>${r.family}</span><span>·</span>
+          <span>${r.risk}风险</span><span>·</span>
+          <span>${r.engine}引擎</span><span>·</span>
+          <span>${r.window}</span>
+        </div>
+        <div class="record-stats">
+          <span>收益 <span class="${clsPct(r.total_return)}">${fmtPct(r.total_return)}</span></span>
+          <span>夏普 <span class="val">${r.sharpe.toFixed(2)}</span></span>
+          <span>回撤 <span class="val">${fmtPct(r.max_dd)}</span></span>
+          <span>胜率 <span class="val">${(r.win_rate*100).toFixed(1)}%</span></span>
+          <span>交易 <span class="val">${r.trade_count}</span>次</span>
+        </div>
+        ${r.notes ? `<div style="font-size:.72rem;color:var(--muted);margin-bottom:.35rem">${esc(r.notes)}</div>` : ''}
+        <div style="font-size:.7rem;color:var(--muted);margin-bottom:.45rem">${r.created_at}</div>
+        <div class="record-actions">
+          <button class="btn-sm" onclick="openRename(${r.id},'${esc(r.name)}','${esc(r.notes||'')}')">✎ 编辑</button>
+          ${r.status==='completed'
+            ? `<button class="btn-sm play" onclick="runRecord(${r.id})">▶ 启动实盘</button>`
+            : `<button class="btn-sm running" disabled>⟳ 运行中...</button>`}
+          <button class="btn-sm danger" onclick="deleteRecord(${r.id})">🗑 删除</button>
+        </div>
+      </div>`).join('');
+  } catch(e) { showMsg('error','加载记录失败: '+e.message); }
+}
+
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── CRUD actions ──────────────────────────────────────────
+async function deleteRecord(id) {
+  if (!confirm('确定删除这条回测记录？')) return;
+  try { await api('/api/records/'+id, {method:'DELETE'}); showMsg('success','已删除'); loadRecords(); }
+  catch(e) { showMsg('error',e.message); }
+}
+
+function openRename(id, name, notes) {
+  currentRid = id; $('#renameName').value = name; $('#renameNotes').value = notes;
+  $('#renameModal').style.display = '';
+}
+function closeRename() { $('#renameModal').style.display = 'none'; currentRid = null; }
+$('#renameSave').addEventListener('click', async () => {
+  try {
+    await api('/api/records/'+currentRid, {method:'PUT', body:{name:$('#renameName').value.trim(), notes:$('#renameNotes').value.trim()}});
+    closeRename(); showMsg('success','已更新'); loadRecords();
+  } catch(e) { showMsg('error',e.message); }
+});
+$('#renameModal').addEventListener('click', e => { if (e.target === $('#renameModal')) closeRename(); });
+
+async function runRecord(id) {
+  try {
+    const { record } = await api('/api/records/'+id+'/run', {method:'POST'});
+    showMsg('success', `"${record.name}" 已启动实盘运行`);
+    loadRecords();
+    // 2 秒后自动刷新
+    setTimeout(loadRecords, 2500);
+  } catch(e) { showMsg('error',e.message); }
+}
+{% endraw %}
+</script>
+</body>
+</html>

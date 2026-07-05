@@ -1,0 +1,177 @@
+{
+  "test_time": "2026-07-04T23:50:36.171248",
+  "total": 28,
+  "passed": 28,
+  "failed": 0,
+  "all_passed": true,
+  "results": [
+    {
+      "name": "服务可达",
+      "status": "✅ PASS",
+      "detail": "{'db': 'connected', 'status': 'ok', 'timestamp': '2026-07-04T15:50:35.033545+00:00'}",
+      "passed": true
+    },
+    {
+      "name": "注册新用户",
+      "status": "✅ PASS",
+      "detail": "status=201, username=testuser",
+      "passed": true
+    },
+    {
+      "name": "拒绝重复用户名",
+      "status": "✅ PASS",
+      "detail": "用户名已被注册",
+      "passed": true
+    },
+    {
+      "name": "拒绝无效输入",
+      "status": "✅ PASS",
+      "detail": "status=400",
+      "passed": true
+    },
+    {
+      "name": "注册第二个用户",
+      "status": "✅ PASS",
+      "detail": "user_id=2",
+      "passed": true
+    },
+    {
+      "name": "正常登录",
+      "status": "✅ PASS",
+      "detail": "session=remember_token=1|bad944cb28de26ce666aa4f...",
+      "passed": true
+    },
+    {
+      "name": "拒绝错误密码",
+      "status": "✅ PASS",
+      "detail": "用户名或密码错误",
+      "passed": true
+    },
+    {
+      "name": "获取当前用户",
+      "status": "✅ PASS",
+      "detail": "email=test@strata.dev",
+      "passed": true
+    },
+    {
+      "name": "保存策略 #1: 沪深300趋势跟踪策略",
+      "status": "✅ PASS",
+      "detail": "id=1, family=趋势跟踪",
+      "passed": true
+    },
+    {
+      "name": "保存策略 #2: 创业板均值回归策略",
+      "status": "✅ PASS",
+      "detail": "id=2, family=均值回归",
+      "passed": true
+    },
+    {
+      "name": "保存策略 #3: 科创50 VBT基准线策略",
+      "status": "✅ PASS",
+      "detail": "id=3, family=趋势跟踪",
+      "passed": true
+    },
+    {
+      "name": "保存策略 #4: 多策略投票稳健版",
+      "status": "✅ PASS",
+      "detail": "id=4, family=多策略投票",
+      "passed": true
+    },
+    {
+      "name": "列出策略列表",
+      "status": "✅ PASS",
+      "detail": "total=4, per_page=20",
+      "passed": true
+    },
+    {
+      "name": "按家族筛选",
+      "status": "✅ PASS",
+      "detail": "趋势跟踪数量=2",
+      "passed": true
+    },
+    {
+      "name": "未登录拒绝访问",
+      "status": "✅ PASS",
+      "detail": "未登录",
+      "passed": true
+    },
+    {
+      "name": "保存回测结果 #1 (策略ID=1)",
+      "status": "✅ PASS",
+      "detail": "return=5.69%, sharpe=0.60",
+      "passed": true
+    },
+    {
+      "name": "保存回测结果 #2 (策略ID=2)",
+      "status": "✅ PASS",
+      "detail": "return=12.25%, sharpe=1.91",
+      "passed": true
+    },
+    {
+      "name": "保存回测结果 #3 (策略ID=3)",
+      "status": "✅ PASS",
+      "detail": "return=-1.73%, sharpe=-0.19",
+      "passed": true
+    },
+    {
+      "name": "查询回测结果列表",
+      "status": "✅ PASS",
+      "detail": "strategy_id=1, count=1",
+      "passed": true
+    },
+    {
+      "name": "策略总数正确",
+      "status": "✅ PASS",
+      "detail": "strategies=4",
+      "passed": true
+    },
+    {
+      "name": "回测结果总数正确",
+      "status": "✅ PASS",
+      "detail": "results=3",
+      "passed": true
+    },
+    {
+      "name": "最近策略列表",
+      "status": "✅ PASS",
+      "detail": "recent=4",
+      "passed": true
+    },
+    {
+      "name": "user2 登录成功",
+      "status": "✅ PASS",
+      "detail": "",
+      "passed": true
+    },
+    {
+      "name": "user2 看不到 testuser 的数据",
+      "status": "✅ PASS",
+      "detail": "total=0 (预期 0)",
+      "passed": true
+    },
+    {
+      "name": "user2 保存自己的策略",
+      "status": "✅ PASS",
+      "detail": "id=5",
+      "passed": true
+    },
+    {
+      "name": "testuser 看不到 user2 的数据",
+      "status": "✅ PASS",
+      "detail": "total=4 (预期 4，只有自己的)",
+      "passed": true
+    },
+    {
+      "name": "删除策略",
+      "status": "✅ PASS",
+      "detail": "策略已删除",
+      "passed": true
+    },
+    {
+      "name": "删除后总数减少",
+      "status": "✅ PASS",
+      "detail": "total=3 (预期 3)",
+      "passed": true
+    }
+  ]
+}

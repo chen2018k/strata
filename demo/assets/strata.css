@@ -1,0 +1,3822 @@
+﻿:root {
+  color-scheme: light dark;
+  --composer-top: 68dvh;
+  --composer-width: min(920px, calc(100% - 16rem));
+  --bg: #f4f1e9;
+  --grid: rgba(45, 38, 29, .1);
+  --ink: #201b15;
+  --muted: #6d6254;
+  --line: rgba(32, 27, 21, .26);
+  --line-strong: #201b15;
+  --panel: #fffaf0;
+  --panel-soft: #fff3cf;
+  --panel-warm: #f1c46f;
+  --accent: #df7d4f;
+  --assistant: #fffefa;
+  --user: #51684d;
+  --user-ink: #fffaf0;
+  --shadow: rgba(32, 27, 21, .1);
+}
+
+.stApp {
+  background:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    var(--bg) !important;
+  background-size: 156px 156px !important;
+  background-color: var(--bg) !important;
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+}
+
+[data-testid="stSidebar"],
+[data-testid="stToolbar"],
+#MainMenu,
+footer {
+  display: none !important;
+}
+
+[data-testid="stHeader"] {
+  background: transparent !important;
+}
+
+.block-container {
+  max-width: 1220px;
+  min-height: 100dvh;
+  padding: 1.25rem 2rem 15rem 14rem;
+}
+
+.stApp:has(.landing-page) .block-container {
+  max-width: none;
+  width: min(1240px, calc(100vw - 4rem));
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 0 2rem !important;
+}
+
+[data-testid="element-container"]:has(iframe[height="0"]),
+iframe[height="0"] {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+.workflow-rail {
+  position: fixed;
+  left: 24px;
+  top: 50%;
+  z-index: 9;
+  display: grid;
+  gap: 14px;
+  width: 136px;
+  transform: translateY(-50%);
+}
+
+.workflow-rail::before {
+  content: "";
+  position: absolute;
+  left: 18px;
+  top: 18px;
+  bottom: 18px;
+  width: 2px;
+  background: var(--line-strong);
+}
+
+.workflow-step {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  min-height: 78px;
+  padding: 11px 11px 11px 44px;
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+  box-shadow: 5px 5px 0 var(--shadow);
+}
+
+.workflow-step::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 15px;
+  width: 15px;
+  height: 15px;
+  border: 2px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--panel);
+}
+
+.workflow-step.is-active {
+  background: var(--accent);
+  box-shadow: 7px 7px 0 var(--line-strong);
+  transform: scale(1.05);
+}
+
+.workflow-step.is-done {
+  background: var(--panel-soft);
+}
+
+.workflow-index {
+  font-size: .66rem;
+  font-weight: 900;
+}
+
+.workflow-step strong {
+  font-size: 1.05rem;
+  line-height: 1;
+  font-weight: 900;
+}
+
+.workflow-step em {
+  color: var(--ink);
+  font-size: .74rem;
+  font-style: normal;
+}
+
+.strata-title {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 .78rem;
+  padding: .68rem .82rem;
+  border: 1px solid var(--line-strong);
+  background: rgba(244, 241, 233, .92);
+  box-shadow: 7px 7px 0 rgba(32, 27, 21, .07);
+}
+
+.strata-title h1 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.08rem;
+  line-height: 1;
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.strata-title .title-copy {
+  display: grid;
+  gap: .24rem;
+}
+
+.strata-title .title-copy span {
+  color: var(--muted);
+  font-size: .78rem;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 5.2rem;
+  height: 1.86rem;
+  padding: 0 .78rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--line-strong);
+  color: #fffaf0;
+  font-size: .74rem;
+  font-weight: 900;
+}
+
+.landing-page {
+  height: calc(100dvh - 2.5rem);
+  max-height: calc(100dvh - 2.5rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(320px, .88fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: stretch;
+  gap: clamp(1.4rem, 4vw, 4rem);
+  padding: clamp(.8rem, 2.4vh, 1.4rem) 0 clamp(.9rem, 2.6vh, 1.6rem);
+  overflow: hidden;
+  animation: strata-fade-in .42s ease both;
+}
+
+.landing-nav {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.landing-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: .7rem;
+  font-size: 1.35rem;
+  font-weight: 950;
+}
+
+.landing-mark {
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 4px 4px 0 rgba(32, 27, 21, .12);
+}
+
+.landing-chip {
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: .54rem .86rem;
+  background: var(--panel-soft);
+  font-size: .82rem;
+  font-weight: 900;
+}
+
+.landing-hero {
+  grid-column: 1;
+  grid-row: 2;
+  display: grid;
+  align-content: end;
+  justify-items: start;
+  gap: clamp(.82rem, 2vh, 1.12rem);
+  min-height: 0;
+  padding-bottom: clamp(.6rem, 3vh, 2rem);
+  text-align: left;
+}
+
+.landing-kicker {
+  max-width: 28rem;
+  color: var(--muted);
+  font-weight: 850;
+}
+
+.landing-hero h1 {
+  max-width: 13ch;
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(3.1rem, 6.4vw, 6.4rem);
+  line-height: 1.02;
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.landing-hero h1 span {
+  display: block;
+  white-space: nowrap;
+}
+
+.landing-hero p {
+  max-width: 32rem;
+  margin: 0;
+  color: #463d32;
+  font-size: clamp(.94rem, 1.1vw, 1.02rem);
+  line-height: 1.62;
+}
+
+.landing-cta-slot {
+  width: min(300px, 100%);
+  margin-top: clamp(.45rem, 2vh, 1.2rem);
+}
+
+.landing-start-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: min(300px, 100%);
+  min-height: 3.1rem;
+  padding: 0 1.2rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--line-strong);
+  color: #fffaf0 !important;
+  box-shadow: 5px 5px 0 rgba(32, 27, 21, .14);
+  font-weight: 900;
+  text-decoration: none !important;
+}
+
+.landing-start-link:hover {
+  transform: translateY(-1px);
+}
+
+.landing-cta-slot div[data-testid="stButton"] {
+  margin: 0 !important;
+}
+
+.landing-cta-slot button[kind="primary"],
+div[data-testid="stButton"] button[kind="primary"] {
+  min-height: 3.1rem;
+  border: 1px solid var(--line-strong) !important;
+  border-radius: 999px !important;
+  background: var(--line-strong) !important;
+  color: #fffaf0 !important;
+  font-weight: 900 !important;
+  box-shadow: 5px 5px 0 rgba(32, 27, 21, .14) !important;
+}
+
+.landing-steps {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: center;
+  justify-self: end;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(.72rem, 1.7vh, 1rem);
+  width: min(420px, 100%);
+  margin: 0;
+}
+
+.landing-step {
+  min-height: 96px;
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  column-gap: .9rem;
+  align-items: center;
+  padding: clamp(.78rem, 1.7vh, .95rem);
+  border: 1px solid rgba(32, 27, 21, .2);
+  background: rgba(222, 214, 193, .72);
+  box-shadow: 5px 5px 0 rgba(32, 27, 21, .05);
+  opacity: .88;
+}
+
+.landing-step span {
+  grid-row: 1 / span 2;
+  display: inline-grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 999px;
+  background: #6f614f;
+  color: #fffaf0;
+  font-weight: 950;
+}
+
+.landing-step strong {
+  display: block;
+  margin-bottom: .12rem;
+  font-size: .98rem;
+  font-weight: 950;
+}
+
+.landing-step p {
+  margin: 0;
+  color: #655c4f;
+  font-size: .9rem;
+  line-height: 1.46;
+}
+
+.product-shell.chat-stage {
+  max-width: 920px;
+  height: calc(100dvh - 13.4rem);
+  min-height: 260px;
+  margin: 0 auto;
+  padding: 0 .18rem 9.5rem 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  animation: strata-fade-in .32s ease both;
+}
+
+.product-shell.chat-stage::-webkit-scrollbar {
+  width: 8px;
+}
+
+.product-shell.chat-stage::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(32, 27, 21, .18);
+}
+
+.advisor-card {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: .72rem;
+  align-items: start;
+  margin: 0 0 .75rem;
+  padding: .66rem .75rem;
+  border: 1px solid rgba(32, 27, 21, .36);
+  background: rgba(241, 196, 111, .44);
+}
+
+.advisor-avatar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
+  background: #f08b5f;
+  color: #1c160f;
+  font-weight: 950;
+  font-size: .92rem;
+  letter-spacing: 0;
+  transform: rotate(-3deg);
+}
+
+.advisor-card strong {
+  display: block;
+  margin-bottom: .15rem;
+  font-size: .92rem;
+  font-weight: 900;
+}
+
+.advisor-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: .86rem;
+  line-height: 1.52;
+}
+
+[data-testid="stChatMessage"] {
+  padding: .28rem 0 !important;
+  background: transparent !important;
+}
+
+.product-shell.chat-stage [data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] {
+  max-width: min(58ch, 68%) !important;
+  padding: .82rem .96rem !important;
+  border: 1px solid rgba(32, 27, 21, .42) !important;
+  border-radius: 18px 18px 18px 6px !important;
+  background: var(--assistant) !important;
+  color: var(--ink) !important;
+  box-shadow: 4px 4px 0 rgba(32, 27, 21, .07) !important;
+}
+
+.product-shell.chat-stage [data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] p {
+  margin: 0;
+  line-height: 1.68;
+}
+
+.product-shell.chat-stage [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: .7rem !important;
+}
+
+.product-shell.chat-stage [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) [data-testid="stChatMessageContent"] {
+  flex: 1 1 auto !important;
+  max-width: none !important;
+}
+
+.product-shell.chat-stage [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
+  display: flex !important;
+  flex-direction: row-reverse !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: .7rem !important;
+}
+
+.product-shell.chat-stage [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) [data-testid="stChatMessageContent"],
+.product-shell.chat-stage [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) > div:has([data-testid="stMarkdownContainer"]) {
+  flex: 0 1 fit-content !important;
+  width: fit-content !important;
+  max-width: min(52ch, calc(100% - 3.8rem)) !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+}
+
+.product-shell.chat-stage [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) [data-testid="stMarkdownContainer"] {
+  width: fit-content !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  border-radius: 18px 18px 6px 18px !important;
+  background: var(--user) !important;
+  border-color: rgba(35, 54, 33, .82) !important;
+  color: var(--user-ink) !important;
+  box-shadow: 3px 3px 0 rgba(32, 27, 21, .1) !important;
+}
+
+.product-shell.chat-stage [data-testid="stChatMessageAvatarAssistant"],
+.product-shell.chat-stage [data-testid="stChatMessageAvatarUser"] {
+  border: 1px solid rgba(32, 27, 21, .38) !important;
+  box-shadow: none !important;
+}
+
+.thinking-bubble {
+  display: inline-flex;
+  align-items: center;
+  gap: .34rem;
+  min-width: 4rem;
+}
+
+.thinking-bubble span {
+  width: .4rem;
+  height: .4rem;
+  border-radius: 999px;
+  background: var(--muted);
+  animation: strata-dot 1s infinite ease-in-out;
+}
+
+.thinking-bubble span:nth-child(2) { animation-delay: .14s; }
+.thinking-bubble span:nth-child(3) { animation-delay: .28s; }
+
+.suggestion-dock {
+  width: min(920px, 100%);
+  height: 0;
+  margin: 0 auto;
+  padding: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.suggestion-inner {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.suggestion-title {
+  display: block;
+  margin: 0 0 .38rem;
+  color: #7a5524;
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.suggestion-row {
+  display: block;
+}
+
+.suggestion-dock + div[data-testid="stHorizontalBlock"] {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 5.65rem;
+  z-index: 21;
+  width: min(920px, calc(100% - 16rem));
+  margin: 0 auto;
+  padding: .48rem .56rem;
+  border: 1px solid rgba(32, 27, 21, .22);
+  border-radius: 18px;
+  background: rgba(255, 250, 235, .95);
+  box-shadow: 0 10px 34px rgba(32, 27, 21, .08);
+  gap: .34rem !important;
+  pointer-events: auto;
+}
+
+.suggestion-dock + div[data-testid="stHorizontalBlock"] div[data-testid="stButton"] {
+  margin: 0 !important;
+  animation: suggestion-rise .72s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.suggestion-dock + div[data-testid="stHorizontalBlock"] div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] { animation-delay: .18s; }
+.suggestion-dock + div[data-testid="stHorizontalBlock"] div[data-testid="column"]:nth-child(3) div[data-testid="stButton"] { animation-delay: .36s; }
+.suggestion-dock + div[data-testid="stHorizontalBlock"] div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] { animation-delay: .54s; }
+
+.suggestion-dock + div[data-testid="stHorizontalBlock"] button[kind="secondary"],
+.suggestion-dock + div[data-testid="stHorizontalBlock"] button[data-testid="baseButton-secondary"] {
+  min-height: 2.18rem !important;
+  padding: .26rem .58rem !important;
+  border: 1px solid rgba(32, 27, 21, .24) !important;
+  border-radius: 999px !important;
+  background: #fffdf7 !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+  font-size: .78rem !important;
+  font-weight: 700 !important;
+}
+
+.suggestion-dock + div[data-testid="stHorizontalBlock"] button[kind="secondary"]:hover,
+.suggestion-dock + div[data-testid="stHorizontalBlock"] button[data-testid="baseButton-secondary"]:hover {
+  border-color: rgba(32, 27, 21, .45) !important;
+  background: #f8dfaa !important;
+}
+
+div[data-testid="element-container"]:has(.suggestion-dock) {
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+div[data-testid="element-container"]:has(.suggestion-dock) + div[data-testid="stHorizontalBlock"] {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 5.65rem !important;
+  z-index: 21 !important;
+  width: min(920px, calc(100% - 16rem)) !important;
+  margin: 0 auto !important;
+  padding: .48rem .56rem !important;
+  border: 1px solid rgba(32, 27, 21, .22) !important;
+  border-radius: 18px !important;
+  background: rgba(255, 250, 235, .95) !important;
+  box-shadow: 0 10px 34px rgba(32, 27, 21, .08) !important;
+  gap: .34rem !important;
+  pointer-events: auto !important;
+}
+
+div[data-testid="element-container"]:has(.suggestion-dock) + div[data-testid="stHorizontalBlock"] div[data-testid="stButton"] {
+  margin: 0 !important;
+  animation: suggestion-rise .72s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+div[data-testid="element-container"]:has(.suggestion-dock) + div[data-testid="stHorizontalBlock"] div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] { animation-delay: .18s; }
+div[data-testid="element-container"]:has(.suggestion-dock) + div[data-testid="stHorizontalBlock"] div[data-testid="column"]:nth-child(3) div[data-testid="stButton"] { animation-delay: .36s; }
+div[data-testid="element-container"]:has(.suggestion-dock) + div[data-testid="stHorizontalBlock"] div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] { animation-delay: .54s; }
+
+div[data-testid="element-container"]:has(.suggestion-dock) + div[data-testid="stHorizontalBlock"] button[kind="secondary"],
+div[data-testid="element-container"]:has(.suggestion-dock) + div[data-testid="stHorizontalBlock"] button[data-testid="baseButton-secondary"] {
+  min-height: 2.18rem !important;
+  padding: .26rem .58rem !important;
+  border: 1px solid rgba(32, 27, 21, .24) !important;
+  border-radius: 999px !important;
+  background: #fffdf7 !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+  font-size: .78rem !important;
+  font-weight: 700 !important;
+}
+
+div[data-testid="element-container"]:has(.suggestion-dock) + div[data-testid="stHorizontalBlock"] button[kind="secondary"]:hover,
+div[data-testid="element-container"]:has(.suggestion-dock) + div[data-testid="stHorizontalBlock"] button[data-testid="baseButton-secondary"]:hover {
+  border-color: rgba(32, 27, 21, .45) !important;
+  background: #f8dfaa !important;
+}
+
+[data-testid="stBottom"],
+[data-testid="stBottomBlockContainer"] {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+[data-testid="stBottom"] {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 20 !important;
+  display: flex !important;
+  justify-content: center !important;
+  padding: .72rem 2rem .92rem 14rem !important;
+  pointer-events: none;
+}
+
+[data-testid="stBottomBlockContainer"] {
+  width: min(920px, 100%) !important;
+  padding: 0 !important;
+  pointer-events: auto;
+}
+
+[data-testid="stBottom"]::before,
+[data-testid="stBottom"]::after,
+[data-testid="stBottomBlockContainer"]::before,
+[data-testid="stBottomBlockContainer"]::after {
+  display: none !important;
+  content: none !important;
+}
+
+[data-testid="stChatInput"] {
+  max-width: 920px !important;
+  border: 1px solid rgba(32, 27, 21, .34) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 253, 247, .98) !important;
+  box-shadow: 0 10px 34px rgba(32, 27, 21, .09) !important;
+}
+
+[data-testid="stChatInput"] textarea {
+  color: var(--ink) !important;
+}
+
+[data-testid="stChatInput"] textarea::placeholder {
+  color: var(--muted) !important;
+}
+
+[data-testid="stChatInput"] button {
+  border-radius: 999px !important;
+}
+
+[data-testid="stStatusWidget"] {
+  display: none !important;
+}
+
+.strategy-stage,
+.backtest-stage {
+  min-height: calc(100dvh - 10rem);
+  display: grid;
+  place-items: center;
+  padding: 2rem 0 7rem;
+  animation: strata-rise-in .38s ease both;
+}
+
+.strategy-panel,
+.backtest-panel {
+  width: min(860px, 100%);
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+  box-shadow: 10px 10px 0 rgba(32, 27, 21, .1);
+}
+
+.strategy-panel > h2,
+.backtest-panel > h2 {
+  margin: 0 0 1rem;
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
+  line-height: 1.05;
+  font-weight: 950;
+}
+
+.strategy-followup,
+.backtest-action-panel {
+  margin-top: 1.2rem;
+  padding: 1rem;
+  border: 1px solid var(--line-strong);
+  background: var(--panel-soft);
+}
+
+.strategy-panel div[data-testid="stForm"] {
+  margin-top: .75rem !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.strategy-panel div[data-testid="stTextInput"] input {
+  min-height: 2.7rem !important;
+  border: 1px solid rgba(32, 27, 21, .24) !important;
+  border-radius: 999px !important;
+  background: rgba(232, 239, 225, .96) !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+}
+
+.strategy-panel div[data-testid="stFormSubmitButton"] button {
+  min-height: 2.6rem !important;
+  border-radius: 999px !important;
+  background: #3f5144 !important;
+  color: #fffaf0 !important;
+  font-weight: 850 !important;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  margin: .18rem .28rem .18rem 0;
+  padding: .18rem .55rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .5);
+  font-size: .84rem;
+}
+
+.chat-end-spacer {
+  height: 42dvh;
+}
+
+#chat-scroll-anchor {
+  display: block;
+  height: 1px;
+}
+
+@keyframes strata-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes strata-rise-in {
+  from { opacity: 0; transform: translateY(42px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes strata-dot {
+  0%, 80%, 100% { transform: translateY(0); opacity: .36; }
+  40% { transform: translateY(-.24rem); opacity: 1; }
+}
+
+@keyframes suggestion-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fixed-suggestions-anchor,
+.fixed-composer-anchor {
+  display: block;
+  height: 0;
+  min-height: 0;
+  overflow: visible;
+}
+
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor),
+div[data-testid="element-container"]:has(.fixed-composer-anchor) {
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 5.7rem !important;
+  z-index: 40 !important;
+  width: min(920px, calc(100% - 16rem)) !important;
+  margin: 0 auto !important;
+  padding: .48rem .56rem !important;
+  border: 1px solid rgba(32, 27, 21, .2) !important;
+  border-radius: 18px !important;
+  background: rgba(255, 250, 235, .96) !important;
+  box-shadow: 0 14px 34px rgba(32, 27, 21, .08) !important;
+  gap: .34rem !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] div[data-testid="stButton"] {
+  margin: 0 !important;
+  animation: suggestion-rise .72s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] { animation-delay: .18s; }
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] div[data-testid="column"]:nth-child(3) div[data-testid="stButton"] { animation-delay: .36s; }
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] { animation-delay: .54s; }
+
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] button[kind="secondary"],
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] button[data-testid="baseButton-secondary"] {
+  min-height: 2.12rem !important;
+  padding: .25rem .58rem !important;
+  border: 1px solid rgba(32, 27, 21, .24) !important;
+  border-radius: 999px !important;
+  background: #fffdf7 !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+  font-size: .78rem !important;
+  font-weight: 750 !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] button[kind="secondary"]:hover,
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] button[data-testid="baseButton-secondary"]:hover {
+  border-color: rgba(32, 27, 21, .45) !important;
+  background: #f8dfaa !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 1rem !important;
+  z-index: 41 !important;
+  width: min(920px, calc(100% - 16rem)) !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-composer-anchor) ~ div[data-testid="stForm"] {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: auto !important;
+  bottom: 1rem !important;
+  z-index: 1001 !important;
+  width: var(--composer-width) !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] form,
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] [data-testid="stForm"] {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] div[data-testid="stHorizontalBlock"] {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 5.4rem !important;
+  gap: .55rem !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: .5rem .52rem !important;
+  border: 1px solid rgba(32, 27, 21, .28) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 253, 247, .98) !important;
+  box-shadow: 0 16px 38px rgba(32, 27, 21, .1) !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] div[data-testid="column"],
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] div[data-testid="stVerticalBlock"],
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] div[data-testid="element-container"],
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] div[data-testid="stTextInput"],
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] div[data-testid="stButton"] {
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] input {
+  min-height: 2.75rem !important;
+  padding: 0 1rem !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+  font-size: .98rem !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] input::placeholder {
+  color: var(--muted) !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] button[kind="primary"],
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] button[data-testid="baseButton-primary"] {
+  min-height: 2.75rem !important;
+  width: 100% !important;
+  padding: 0 .9rem !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: var(--line-strong) !important;
+  color: #fffaf0 !important;
+  box-shadow: none !important;
+  font-size: .88rem !important;
+  font-weight: 850 !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] button[kind="secondary"],
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] button[data-testid="baseButton-secondary"] {
+  min-height: 2.12rem !important;
+  padding: .25rem .62rem !important;
+  border: 1px solid rgba(94, 75, 54, .16) !important;
+  border-radius: 999px !important;
+  background: #dfead8 !important;
+  color: #2a332b !important;
+  box-shadow: none !important;
+  font-size: .8rem !important;
+  font-weight: 760 !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] div[data-testid="column"]:nth-child(2) button {
+  background: #eadfd2 !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] div[data-testid="column"]:nth-child(3) button {
+  background: #d8e4ea !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] div[data-testid="column"]:nth-child(4) button {
+  background: #ece5be !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] button[kind="secondary"]:hover,
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] button[data-testid="baseButton-secondary"]:hover {
+  border-color: rgba(94, 75, 54, .34) !important;
+  filter: saturate(1.04) brightness(.99);
+}
+
+[data-testid="stBottom"],
+[data-testid="stBottomBlockContainer"],
+[data-testid="stChatInput"] {
+  display: none !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #151612;
+    --grid: rgba(255, 244, 199, .08);
+    --ink: #f7eedf;
+    --muted: #d5c8b4;
+    --line: rgba(255, 244, 199, .32);
+    --line-strong: #f4d48c;
+    --panel: #202016;
+    --panel-soft: #332b1e;
+    --panel-warm: #4b3822;
+    --assistant: #25261f;
+    --user: #ddb15e;
+    --user-ink: #18130c;
+    --shadow: rgba(0, 0, 0, .35);
+  }
+
+  .strata-title,
+  .product-shell.chat-stage,
+  .strategy-panel,
+  .backtest-panel,
+  .landing-step {
+    border-color: rgba(255, 244, 199, .42);
+    background: rgba(28, 29, 23, .96);
+    box-shadow: 10px 10px 0 rgba(0, 0, 0, .32);
+  }
+
+  .landing-hero p,
+  .landing-kicker,
+  .landing-step p,
+  .strata-title .title-copy span,
+  .advisor-card p {
+    color: var(--muted);
+  }
+
+  .landing-chip,
+  .advisor-card,
+  .suggestion-dock,
+  .strategy-followup,
+  .backtest-action-panel {
+    border-color: rgba(255, 244, 199, .28);
+    background: rgba(60, 47, 27, .72);
+    color: var(--ink);
+  }
+
+  .suggestion-dock,
+  .suggestion-dock + div[data-testid="stHorizontalBlock"],
+  div[data-testid="element-container"]:has(.suggestion-dock) + div[data-testid="stHorizontalBlock"] {
+    border-color: rgba(255, 244, 199, .24);
+    background: rgba(32, 32, 22, .98);
+  }
+
+  .product-shell.chat-stage [data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] {
+    border-color: rgba(255, 244, 199, .32) !important;
+    background: var(--assistant) !important;
+    color: var(--ink) !important;
+  }
+
+  .product-shell.chat-stage [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) [data-testid="stMarkdownContainer"] {
+    background: var(--user) !important;
+    border-color: #f1ce86 !important;
+    color: var(--user-ink) !important;
+  }
+
+  .suggestion-title {
+    color: #f2c77d;
+  }
+
+  .suggestion-dock + div[data-testid="stHorizontalBlock"] button[kind="secondary"],
+  .suggestion-dock + div[data-testid="stHorizontalBlock"] button[data-testid="baseButton-secondary"],
+  div[data-testid="element-container"]:has(.suggestion-dock) + div[data-testid="stHorizontalBlock"] button[kind="secondary"],
+  div[data-testid="element-container"]:has(.suggestion-dock) + div[data-testid="stHorizontalBlock"] button[data-testid="baseButton-secondary"] {
+    border-color: rgba(255, 244, 199, .26) !important;
+    background: #292a23 !important;
+    color: var(--ink) !important;
+  }
+
+  [data-testid="stChatInput"] {
+    border-color: rgba(255, 244, 199, .32) !important;
+    background: #24251f !important;
+  }
+
+  [data-testid="stChatInput"] textarea {
+    color: var(--ink) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .block-container {
+    padding: 1rem 1rem 15rem;
+  }
+
+  .workflow-rail {
+    position: static;
+    width: auto;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin: 0 0 1rem;
+    transform: none;
+  }
+
+  .workflow-rail::before,
+  .workflow-step::before,
+  .workflow-step em {
+    display: none;
+  }
+
+  .workflow-step {
+    min-height: 58px;
+    padding: .65rem;
+  }
+
+  .workflow-step strong {
+    font-size: .86rem;
+  }
+
+  .landing-page {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    height: auto;
+    max-height: none;
+    min-height: calc(100dvh - 2rem);
+    align-content: start;
+    gap: 1rem;
+    padding-top: .8rem;
+    overflow: visible;
+  }
+
+  .landing-hero {
+    grid-column: 1;
+    grid-row: 2;
+    justify-items: center;
+    align-content: start;
+    padding-bottom: 0;
+    text-align: center;
+  }
+
+  .landing-hero h1 {
+    max-width: 13ch;
+    font-size: clamp(2.6rem, 10vw, 4.2rem);
+  }
+
+  .landing-cta-slot {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .landing-steps {
+    grid-column: 1;
+    grid-row: 3;
+    justify-self: stretch;
+    width: 100%;
+    gap: .7rem;
+  }
+
+  .landing-step {
+    min-height: 82px;
+  }
+
+  .product-shell.chat-stage [data-testid="stChatMessage"] [data-testid="stMarkdownContainer"],
+  .product-shell.chat-stage [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) [data-testid="stChatMessageContent"] {
+    max-width: calc(100vw - 6rem) !important;
+  }
+
+  .suggestion-dock,
+  .suggestion-dock + div[data-testid="stHorizontalBlock"],
+  div[data-testid="element-container"]:has(.suggestion-dock) + div[data-testid="stHorizontalBlock"] {
+    width: calc(100% - 2rem) !important;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  [data-testid="stBottom"] {
+    padding: .72rem 1rem .92rem !important;
+  }
+}
+
+/* Final fixed composer override: keep the bottom UI independent from Streamlit's native bottom layer. */
+.stApp:has(.product-shell.chat-stage) .block-container {
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden;
+  padding-top: .8rem;
+  padding-bottom: 0;
+}
+
+.stApp:has(.product-shell.chat-stage) .strata-title {
+  margin-bottom: .62rem;
+  padding: .72rem .86rem;
+}
+
+.stApp:has(.product-shell.chat-stage) .advisor-card {
+  margin-bottom: .55rem;
+  padding: .54rem .66rem;
+}
+
+[data-testid="stBottom"],
+[data-testid="stBottomBlockContainer"],
+[data-testid="stChatInput"] {
+  display: none !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor),
+div[data-testid="element-container"]:has(.fixed-composer-anchor) {
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: auto !important;
+  bottom: 5.7rem !important;
+  z-index: 1000 !important;
+  width: var(--composer-width) !important;
+  margin: 0 auto !important;
+  padding: .48rem .56rem !important;
+  border: 1px solid rgba(112, 91, 65, .16) !important;
+  border-radius: 18px !important;
+  background: rgba(238, 229, 209, .92) !important;
+  box-shadow: 0 14px 34px rgba(97, 82, 60, .08) !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: auto !important;
+  bottom: 1rem !important;
+  z-index: 1001 !important;
+  width: var(--composer-width) !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"],
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] *,
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] form {
+  box-shadow: none !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] form,
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] > div,
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] div[data-testid="stVerticalBlock"] {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] div[data-testid="stHorizontalBlock"] {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 5.4rem !important;
+  gap: .55rem !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: .5rem .52rem !important;
+  border: 1px solid rgba(112, 91, 65, .18) !important;
+  border-radius: 999px !important;
+  background: rgba(232, 239, 225, .96) !important;
+  box-shadow: 0 16px 38px rgba(97, 82, 60, .1) !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-composer-anchor) ~ div[data-testid="stForm"] div[data-testid="stHorizontalBlock"] {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 5.4rem !important;
+  gap: .55rem !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: .5rem .52rem !important;
+  border: 1px solid rgba(112, 91, 65, .18) !important;
+  border-radius: 999px !important;
+  background: rgba(232, 239, 225, .96) !important;
+  box-shadow: 0 16px 38px rgba(97, 82, 60, .1) !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] div[data-testid="column"],
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] div[data-testid="element-container"],
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] div[data-testid="stTextInput"],
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] div[data-testid="stFormSubmitButton"],
+div[data-testid="element-container"]:has(.fixed-composer-anchor) ~ div[data-testid="stForm"] div[data-testid="column"],
+div[data-testid="element-container"]:has(.fixed-composer-anchor) ~ div[data-testid="stForm"] div[data-testid="element-container"],
+div[data-testid="element-container"]:has(.fixed-composer-anchor) ~ div[data-testid="stForm"] div[data-testid="stTextInput"],
+div[data-testid="element-container"]:has(.fixed-composer-anchor) ~ div[data-testid="stForm"] div[data-testid="stFormSubmitButton"] {
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] input {
+  min-height: 2.75rem !important;
+  padding: 0 1rem !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+  font-size: .98rem !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-composer-anchor) ~ div[data-testid="stForm"] input {
+  min-height: 2.75rem !important;
+  padding: 0 1rem !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+  font-size: .98rem !important;
+}
+
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] button[kind="primary"],
+div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] button[data-testid="baseButton-primary"],
+div[data-testid="element-container"]:has(.fixed-composer-anchor) ~ div[data-testid="stForm"] button[kind="primary"],
+div[data-testid="element-container"]:has(.fixed-composer-anchor) ~ div[data-testid="stForm"] button[data-testid="baseButton-primary"] {
+  min-height: 2.75rem !important;
+  width: 100% !important;
+  padding: 0 .9rem !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: #3f5144 !important;
+  color: #fffaf0 !important;
+  box-shadow: none !important;
+  font-size: .88rem !important;
+  font-weight: 850 !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] {
+    border-color: rgba(218, 203, 174, .22) !important;
+    background: rgba(55, 54, 45, .96) !important;
+  }
+
+  div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] div[data-testid="stHorizontalBlock"] {
+    border-color: rgba(218, 203, 174, .26) !important;
+    background: #2f342d !important;
+  }
+
+  div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] button[kind="secondary"],
+  div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] button[data-testid="baseButton-secondary"] {
+    border-color: rgba(218, 203, 174, .22) !important;
+    background: #465543 !important;
+    color: #f7eedf !important;
+  }
+
+  div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] div[data-testid="column"]:nth-child(2) button {
+    background: #5a4b40 !important;
+  }
+
+  div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] div[data-testid="column"]:nth-child(3) button {
+    background: #40515a !important;
+  }
+
+  div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] div[data-testid="column"]:nth-child(4) button {
+    background: #5a533b !important;
+  }
+}
+
+@media (max-width: 900px) {
+  div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"],
+  div[data-testid="element-container"]:has(.fixed-composer-anchor) + div[data-testid="stForm"] {
+    width: calc(100% - 2rem) !important;
+  }
+
+  .stApp:has(.product-shell.chat-stage) .block-container {
+    padding: .65rem 1rem 0;
+  }
+
+  .product-shell.chat-stage {
+    height: calc(100dvh - 12.8rem);
+    min-height: 240px;
+    padding-bottom: 9.25rem;
+  }
+}
+/* Page-level layout locks. These overrides isolate the landing and chat states. */
+.stApp:has(.landing-page) .block-container {
+  width: min(1240px, calc(100vw - 4rem));
+  max-width: none;
+  height: 100dvh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 0 2rem !important;
+  overflow: hidden;
+}
+
+.stApp:has(.landing-page) .landing-page {
+  height: 100dvh;
+  max-height: 100dvh;
+  grid-template-columns: minmax(440px, 1.05fr) minmax(340px, .82fr);
+  grid-template-rows: 72px minmax(0, 1fr);
+  column-gap: clamp(2rem, 5vw, 5rem);
+  padding: 0;
+}
+
+.stApp:has(.landing-page) .landing-hero {
+  align-content: end;
+  justify-items: start;
+  padding-bottom: clamp(3rem, 10vh, 6.5rem);
+}
+
+.stApp:has(.landing-page) .landing-hero h1 {
+  max-width: 9.5ch;
+  font-size: clamp(4.4rem, 7.2vw, 7.2rem);
+  line-height: .98;
+}
+
+.stApp:has(.landing-page) .landing-hero p {
+  max-width: 31rem;
+}
+
+.stApp:has(.landing-page) .landing-cta-slot {
+  margin-top: clamp(1.6rem, 5vh, 3.6rem);
+}
+
+.stApp:has(.landing-page) .landing-steps {
+  align-self: center;
+  justify-self: end;
+  width: min(420px, 100%);
+  gap: .78rem;
+}
+
+.stApp:has(.landing-page) .landing-step {
+  min-height: 88px;
+  background: rgba(224, 214, 192, .6);
+}
+
+.stApp:has(.product-shell.chat-stage) {
+  --composer-width: min(880px, calc(100vw - 17rem));
+}
+
+.stApp:has(.product-shell.chat-stage) .block-container {
+  max-width: 1220px;
+  height: 100dvh;
+  min-height: 100dvh;
+  padding: .72rem 2rem 0 14rem !important;
+  overflow: hidden;
+}
+
+.stApp:has(.product-shell.chat-stage) .product-shell.chat-stage {
+  height: calc(100dvh - 12.2rem);
+  min-height: 300px;
+  padding-bottom: 1.2rem;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 1rem !important;
+  z-index: 1200 !important;
+  width: var(--composer-width) !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input),
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) *,
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) form {
+  box-shadow: none !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) form,
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) > div,
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stVerticalBlock"] {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stHorizontalBlock"] {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 5.4rem !important;
+  gap: .55rem !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: .5rem .52rem !important;
+  border: 1px solid rgba(112, 91, 65, .18) !important;
+  border-radius: 999px !important;
+  background: rgba(232, 239, 225, .96) !important;
+  box-shadow: 0 16px 38px rgba(97, 82, 60, .1) !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="column"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="element-container"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stTextInput"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stFormSubmitButton"] {
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) input {
+  min-height: 2.75rem !important;
+  padding: 0 1rem !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+  font-size: .98rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) button[kind="primary"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) button[data-testid="baseButton-primary"] {
+  min-height: 2.75rem !important;
+  width: 100% !important;
+  padding: 0 .9rem !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: #3f5144 !important;
+  color: #fffaf0 !important;
+  box-shadow: none !important;
+  font-size: .88rem !important;
+  font-weight: 850 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 5.7rem !important;
+  z-index: 1199 !important;
+  width: var(--composer-width) !important;
+  margin: 0 auto !important;
+}
+
+@media (max-width: 900px) {
+  .stApp:has(.landing-page) .block-container {
+    width: 100%;
+    height: auto;
+    min-height: 100dvh;
+    padding: 0 1rem !important;
+    overflow: visible;
+  }
+
+  .stApp:has(.landing-page) .landing-page {
+    height: auto;
+    max-height: none;
+    min-height: 100dvh;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    row-gap: 1rem;
+    padding: .75rem 0 1.25rem;
+  }
+
+  .stApp:has(.landing-page) .landing-hero {
+    align-content: start;
+    justify-items: center;
+    padding-bottom: 0;
+    text-align: center;
+  }
+
+  .stApp:has(.landing-page) .landing-hero h1 {
+    max-width: 10ch;
+    font-size: clamp(3rem, 13vw, 4.4rem);
+  }
+
+  .stApp:has(.product-shell.chat-stage) {
+    --composer-width: calc(100vw - 2rem);
+  }
+
+  .stApp:has(.product-shell.chat-stage) .block-container {
+    padding: .65rem 1rem 0 !important;
+  }
+
+  .stApp:has(.product-shell.chat-stage) .product-shell.chat-stage {
+    height: calc(100dvh - 12.6rem);
+  }
+}
+
+/* Strata final visual lock v2 */
+:root {
+  color-scheme: light;
+  --bg: #f4f1e9;
+  --grid: rgba(45, 38, 29, .105);
+  --ink: #201b15;
+  --muted: #6f6557;
+  --line-strong: #201b15;
+  --panel: #fffaf0;
+  --panel-soft: #fff1c9;
+  --accent: #df7d4f;
+  --composer-width: min(880px, calc(100vw - 17rem));
+}
+
+html,
+body,
+.stApp,
+[data-testid="stAppViewContainer"],
+[data-testid="stAppViewContainer"] > .main {
+  min-height: 100dvh !important;
+  background:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    var(--bg) !important;
+  background-size: 156px 156px !important;
+  background-color: var(--bg) !important;
+  color: var(--ink) !important;
+}
+
+.stApp:has(.landing-page) [data-testid="stHeader"],
+.stApp:has(.product-shell.chat-stage) [data-testid="stHeader"] {
+  background: transparent !important;
+}
+
+.stApp:has(.landing-page) .block-container {
+  width: min(1240px, calc(100vw - 4rem)) !important;
+  max-width: none !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  margin: 0 auto !important;
+  padding: 0 2rem !important;
+  overflow: hidden !important;
+}
+
+.stApp:has(.landing-page) .landing-page {
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  display: grid !important;
+  grid-template-columns: minmax(440px, 1.05fr) minmax(340px, .82fr) !important;
+  grid-template-rows: 72px minmax(0, 1fr) !important;
+  column-gap: clamp(2rem, 5vw, 5rem) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.stApp:has(.landing-page) .landing-nav {
+  grid-column: 1 / -1 !important;
+  grid-row: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.stApp:has(.landing-page) .landing-brand,
+.stApp:has(.landing-page) .landing-chip,
+.stApp:has(.landing-page) .landing-kicker,
+.stApp:has(.landing-page) .landing-hero h1,
+.stApp:has(.landing-page) .landing-hero p,
+.stApp:has(.landing-page) .landing-step {
+  color: var(--ink) !important;
+}
+
+.stApp:has(.landing-page) .landing-mark {
+  border: 2px solid var(--line-strong) !important;
+  background: var(--accent) !important;
+  box-shadow: 4px 4px 0 rgba(32, 27, 21, .12) !important;
+}
+
+.stApp:has(.landing-page) .landing-chip {
+  border: 1px solid var(--line-strong) !important;
+  border-radius: 999px !important;
+  background: var(--panel-soft) !important;
+}
+
+.stApp:has(.landing-page) .landing-hero {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+  display: grid !important;
+  align-content: end !important;
+  justify-items: start !important;
+  gap: clamp(.82rem, 2vh, 1.12rem) !important;
+  padding: 0 0 clamp(3rem, 10vh, 6.5rem) !important;
+  text-align: left !important;
+}
+
+.stApp:has(.landing-page) .landing-kicker,
+.stApp:has(.landing-page) .landing-hero p {
+  color: var(--muted) !important;
+}
+
+.stApp:has(.landing-page) .landing-hero h1 {
+  max-width: 9.5ch !important;
+  margin: 0 !important;
+  font-size: clamp(4.4rem, 7.2vw, 7.2rem) !important;
+  line-height: .98 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0 !important;
+}
+
+.stApp:has(.landing-page) .landing-hero h1 span {
+  display: block !important;
+  white-space: nowrap !important;
+}
+
+.stApp:has(.landing-page) .landing-hero p {
+  max-width: 31rem !important;
+  margin: 0 !important;
+  line-height: 1.62 !important;
+}
+
+.stApp:has(.landing-page) .landing-cta-slot {
+  width: min(300px, 100%) !important;
+  margin-top: clamp(1.6rem, 5vh, 3.6rem) !important;
+}
+
+.stApp:has(.landing-page) .landing-start-link,
+.stApp:has(.landing-page) .landing-start-link:visited,
+.stApp:has(.landing-page) .landing-start-link:hover,
+.stApp:has(.landing-page) .landing-start-link:active {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: min(300px, 100%) !important;
+  min-height: 3.1rem !important;
+  padding: 0 1.25rem !important;
+  border: 1px solid var(--line-strong) !important;
+  border-radius: 999px !important;
+  background: #201b15 !important;
+  color: #fffaf0 !important;
+  box-shadow: 5px 5px 0 rgba(32, 27, 21, .14) !important;
+  font-size: .98rem !important;
+  font-weight: 900 !important;
+  text-decoration: none !important;
+}
+
+.stApp:has(.landing-page) .landing-start-link::after {
+  content: ">";
+  display: inline-block;
+  margin-left: .55rem;
+  color: #fffaf0 !important;
+  font-weight: 900;
+}
+
+.stApp:has(.landing-page) .landing-steps {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  align-self: center !important;
+  justify-self: end !important;
+  display: grid !important;
+  width: min(420px, 100%) !important;
+  gap: .78rem !important;
+  margin: 0 !important;
+}
+
+.stApp:has(.landing-page) .landing-step {
+  min-height: 88px !important;
+  display: grid !important;
+  grid-template-columns: 38px 1fr !important;
+  column-gap: .9rem !important;
+  align-items: center !important;
+  padding: .86rem !important;
+  border: 1px solid rgba(32, 27, 21, .2) !important;
+  background: rgba(224, 214, 192, .62) !important;
+  box-shadow: 5px 5px 0 rgba(32, 27, 21, .05) !important;
+}
+
+.stApp:has(.landing-page) .landing-step span {
+  grid-row: 1 / span 2 !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  width: 1.9rem !important;
+  height: 1.9rem !important;
+  border-radius: 999px !important;
+  background: #6f614f !important;
+  color: #fffaf0 !important;
+  font-weight: 950 !important;
+}
+
+.stApp:has(.landing-page) .landing-step p {
+  margin: 0 !important;
+  color: var(--muted) !important;
+  line-height: 1.46 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) .block-container {
+  width: min(1220px, calc(100vw - 2rem)) !important;
+  max-width: none !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  margin: 0 auto !important;
+  padding: .72rem 2rem 0 14rem !important;
+  overflow: hidden !important;
+}
+
+.stApp:has(.product-shell.chat-stage) .strata-title {
+  margin-bottom: .45rem !important;
+  padding: .62rem .78rem !important;
+  background: rgba(244, 241, 233, .9) !important;
+}
+
+.stApp:has(.product-shell.chat-stage) .product-shell.chat-stage {
+  width: min(920px, 100%) !important;
+  max-width: 920px !important;
+  height: calc(100dvh - 14.2rem) !important;
+  min-height: 300px !important;
+  margin: 0 auto !important;
+  padding: 0 .2rem 1rem 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+}
+
+.stApp:has(.product-shell.chat-stage) .advisor-card {
+  margin: 0 0 .7rem !important;
+  padding: .64rem .74rem !important;
+  border: 1px solid rgba(32, 27, 21, .28) !important;
+  background: rgba(255, 241, 201, .72) !important;
+  box-shadow: 5px 5px 0 rgba(32, 27, 21, .06) !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessage"] {
+  padding: .3rem 0 !important;
+  background: transparent !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] {
+  max-width: min(58ch, 68%) !important;
+  padding: .78rem .95rem !important;
+  border: 1px solid rgba(32, 27, 21, .34) !important;
+  border-radius: 18px 18px 18px 6px !important;
+  background: rgba(255, 254, 250, .95) !important;
+  color: var(--ink) !important;
+  box-shadow: 4px 4px 0 rgba(32, 27, 21, .05) !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] p {
+  margin: 0 !important;
+  line-height: 1.68 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: .7rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
+  display: flex !important;
+  flex-direction: row-reverse !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: .7rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) [data-testid="stChatMessageContent"],
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) > div:has([data-testid="stMarkdownContainer"]) {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  max-width: none !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) [data-testid="stMarkdownContainer"] {
+  width: fit-content !important;
+  max-width: min(52ch, calc(100% - 1rem)) !important;
+  margin: 0 !important;
+  border-radius: 18px 18px 6px 18px !important;
+  background: #51684d !important;
+  border-color: #51684d !important;
+  color: #fffaf0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 5.45rem !important;
+  z-index: 1199 !important;
+  width: var(--composer-width) !important;
+  margin: 0 auto !important;
+  padding: .42rem .5rem !important;
+  border: 1px solid rgba(112, 91, 65, .16) !important;
+  border-radius: 18px !important;
+  background: rgba(238, 229, 209, .94) !important;
+  box-shadow: 0 14px 34px rgba(97, 82, 60, .08) !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: .9rem !important;
+  z-index: 1200 !important;
+  width: var(--composer-width) !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) form,
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) > div,
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stVerticalBlock"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="element-container"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stTextInput"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stFormSubmitButton"] {
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stHorizontalBlock"] {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 5.4rem !important;
+  gap: .55rem !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: .5rem .52rem !important;
+  border: 1px solid rgba(112, 91, 65, .18) !important;
+  border-radius: 999px !important;
+  background: rgba(232, 239, 225, .98) !important;
+  box-shadow: 0 16px 38px rgba(97, 82, 60, .1) !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) input {
+  min-height: 2.75rem !important;
+  padding: 0 1rem !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+  font-size: .98rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) button[kind="primary"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) button[data-testid="baseButton-primary"] {
+  min-height: 2.75rem !important;
+  width: 100% !important;
+  padding: 0 .9rem !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: #3f5144 !important;
+  color: #fffaf0 !important;
+  box-shadow: none !important;
+  font-size: .88rem !important;
+  font-weight: 850 !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: light;
+  }
+
+  html,
+  body,
+  .stApp,
+  [data-testid="stAppViewContainer"],
+  [data-testid="stAppViewContainer"] > .main {
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+      var(--bg) !important;
+    background-size: 156px 156px !important;
+    color: var(--ink) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .stApp:has(.landing-page) .block-container {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100dvh !important;
+    padding: 0 1rem !important;
+    overflow: visible !important;
+  }
+
+  .stApp:has(.landing-page) .landing-page {
+    height: auto !important;
+    max-height: none !important;
+    min-height: 100dvh !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto auto !important;
+    row-gap: 1rem !important;
+    padding: .75rem 0 1.25rem !important;
+  }
+
+  .stApp:has(.landing-page) .landing-hero {
+    align-content: start !important;
+    justify-items: center !important;
+    padding-bottom: 0 !important;
+    text-align: center !important;
+  }
+
+  .stApp:has(.landing-page) .landing-hero h1 {
+    max-width: 10ch !important;
+    font-size: clamp(3rem, 13vw, 4.4rem) !important;
+  }
+
+  .stApp:has(.product-shell.chat-stage) {
+    --composer-width: calc(100vw - 2rem);
+  }
+
+  .stApp:has(.product-shell.chat-stage) .block-container {
+    width: 100% !important;
+    padding: .65rem 1rem 0 !important;
+  }
+
+  .stApp:has(.product-shell.chat-stage) .product-shell.chat-stage {
+    height: calc(100dvh - 12.6rem) !important;
+  }
+}
+
+/* Strata composer position lock v3 */
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) {
+  position: static !important;
+  width: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) form,
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) > div,
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stVerticalBlock"] {
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stHorizontalBlock"] {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: .9rem !important;
+  z-index: 1200 !important;
+  width: var(--composer-width) !important;
+  height: auto !important;
+  min-height: 3.75rem !important;
+  margin: 0 auto !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 5.4rem !important;
+  gap: .55rem !important;
+  align-items: center !important;
+  padding: .5rem .52rem !important;
+  border: 1px solid rgba(112, 91, 65, .18) !important;
+  border-radius: 999px !important;
+  background: rgba(232, 239, 225, .98) !important;
+  box-shadow: 0 16px 38px rgba(97, 82, 60, .1) !important;
+}
+
+/* Strata composer inner sizing v4 */
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stHorizontalBlock"] div[data-testid="stColumn"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stHorizontalBlock"] div[data-testid="column"] {
+  height: 2.75rem !important;
+  min-height: 2.75rem !important;
+  align-self: center !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stHorizontalBlock"] div[data-testid="stElementContainer"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stHorizontalBlock"] div[data-testid="element-container"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stHorizontalBlock"] div[data-testid="stTextInput"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stHorizontalBlock"] div[data-testid="stTextInputRootElement"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stHorizontalBlock"] div[data-testid="stFormSubmitButton"] {
+  width: 100% !important;
+  height: 2.75rem !important;
+  min-height: 2.75rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stHorizontalBlock"] input {
+  height: 2.75rem !important;
+  min-height: 2.75rem !important;
+  line-height: 2.75rem !important;
+  box-sizing: border-box !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stHorizontalBlock"] button,
+.stApp:has(.product-shell.chat-stage) div[data-testid="stForm"]:has(input) div[data-testid="stHorizontalBlock"] button[data-testid="stBaseButton-primaryFormSubmit"] {
+  height: 2.75rem !important;
+  min-height: 2.75rem !important;
+  max-height: 2.75rem !important;
+  padding: 0 .9rem !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Strata native chat input lock v5 */
+.stApp:has(.product-shell.chat-stage) [data-testid="stBottom"],
+.stApp:has(.product-shell.chat-stage) [data-testid="stBottomBlockContainer"],
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] {
+  display: flex !important;
+  visibility: visible !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stBottom"] {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 1200 !important;
+  justify-content: center !important;
+  padding: 0 0 .9rem !important;
+  background: transparent !important;
+  pointer-events: none !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stBottomBlockContainer"] {
+  width: var(--composer-width) !important;
+  max-width: var(--composer-width) !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  pointer-events: auto !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] {
+  width: 100% !important;
+  min-height: 3.75rem !important;
+  margin: 0 !important;
+  padding: .5rem .6rem !important;
+  border: 1px solid rgba(112, 91, 65, .18) !important;
+  border-radius: 999px !important;
+  background: rgba(232, 239, 225, .98) !important;
+  box-shadow: 0 16px 38px rgba(97, 82, 60, .1) !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] textarea {
+  min-height: 2.6rem !important;
+  color: var(--ink) !important;
+  font-size: .98rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] textarea::placeholder {
+  color: var(--muted) !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button {
+  border-radius: 999px !important;
+  background: #3f5144 !important;
+  color: #fffaf0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] {
+  bottom: 5.35rem !important;
+}
+
+/* Strata chat viewport clearance v6 */
+.stApp:has(.product-shell.chat-stage) .product-shell.chat-stage {
+  height: calc(100dvh - 17rem) !important;
+  min-height: 280px !important;
+  padding-bottom: .75rem !important;
+}
+
+@media (max-width: 900px) {
+  .stApp:has(.product-shell.chat-stage) .product-shell.chat-stage {
+    height: calc(100dvh - 16rem) !important;
+  }
+}
+
+/* Strata chat avatar text lock v7 */
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessageAvatarAssistant"],
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessageAvatarUser"] {
+  width: 2.15rem !important;
+  height: 2.15rem !important;
+  min-width: 2.15rem !important;
+  border: 1px solid rgba(32, 27, 21, .38) !important;
+  border-radius: 12px !important;
+  box-shadow: 3px 3px 0 rgba(32, 27, 21, .08) !important;
+  font-size: .9rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessageAvatarAssistant"] {
+  background: #df7d4f !important;
+  color: #201b15 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessageAvatarUser"] {
+  background: #51684d !important;
+  color: #fffaf0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessageAvatarAssistant"] svg,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessageAvatarUser"] svg,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessageAvatarAssistant"] .material-icons,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessageAvatarUser"] .material-icons {
+  display: none !important;
+}
+
+/* Strata chat polish v8 */
+.stApp:has(.product-shell.chat-stage) {
+  --composer-width: min(720px, calc(100vw - 22rem));
+}
+
+.stApp:has(.product-shell.chat-stage) .block-container {
+  padding-top: .35rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) .strata-title {
+  margin-bottom: .28rem !important;
+  padding: .5rem .72rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) .product-shell.chat-stage {
+  height: calc(100dvh - 13.6rem) !important;
+  min-height: 360px !important;
+  padding-top: 0 !important;
+  padding-bottom: 1rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) .advisor-card {
+  display: none !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessage"] {
+  margin: 0 !important;
+  padding: .22rem 0 !important;
+  background: transparent !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessage"] > div,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessageContent"] {
+  background: transparent !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] {
+  background: rgba(236, 243, 229, .88) !important;
+  border-color: rgba(63, 81, 68, .22) !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) [data-testid="stMarkdownContainer"] {
+  background: #51684d !important;
+  border-color: #51684d !important;
+  color: #fffaf0 !important;
+  box-shadow: none !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stBottom"] {
+  padding-bottom: 1rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] {
+  min-height: 3.35rem !important;
+  padding: .36rem .46rem !important;
+  border-color: rgba(63, 81, 68, .24) !important;
+  background: rgba(214, 229, 207, .98) !important;
+  box-shadow: 0 10px 28px rgba(63, 81, 68, .12) !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"],
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] *,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] div,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] section {
+  box-shadow: none !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] textarea,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] textarea:focus,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] textarea:active {
+  min-height: 2.35rem !important;
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  color: var(--ink) !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button {
+  background: #3f5144 !important;
+  color: #fffaf0 !important;
+  box-shadow: none !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] {
+  bottom: 5.95rem !important;
+  width: var(--composer-width) !important;
+  padding: .38rem .44rem !important;
+  border-color: rgba(63, 81, 68, .18) !important;
+  background: rgba(222, 236, 215, .96) !important;
+  box-shadow: 0 10px 28px rgba(63, 81, 68, .1) !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] button,
+.stApp:has(.product-shell.chat-stage) div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] button[kind="secondary"] {
+  min-height: 2rem !important;
+  background: #edf5e8 !important;
+  border-color: rgba(63, 81, 68, .18) !important;
+  color: #2f3f34 !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 900px) {
+  .stApp:has(.product-shell.chat-stage) {
+    --composer-width: calc(100vw - 2rem);
+  }
+
+  .stApp:has(.product-shell.chat-stage) .product-shell.chat-stage {
+    height: calc(100dvh - 13rem) !important;
+  }
+}
+
+/* Strata chat marker no-layout v9 */
+.stApp:has(.product-shell.chat-stage) .chat-state-marker {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
+}
+
+.stApp:has(.product-shell.chat-stage) .block-container {
+  overflow: hidden !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatMessage"]:first-of-type {
+  margin-top: .25rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) .chat-end-spacer {
+  height: 7rem !important;
+}
+
+/* Strata fixed suggestions dock v10 */
+.stApp:has(.product-shell.chat-stage) div[data-testid="element-container"]:has(.fixed-suggestions-anchor) {
+  width: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="element-container"]:has(.fixed-suggestions-anchor) ~ div[data-testid="stHorizontalBlock"] {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 6.15rem !important;
+  z-index: 1199 !important;
+  width: var(--composer-width) !important;
+  max-width: var(--composer-width) !important;
+  margin: 0 auto !important;
+  padding: .38rem .44rem !important;
+  border: 1px solid rgba(63, 81, 68, .18) !important;
+  border-radius: 18px !important;
+  background: rgba(222, 236, 215, .96) !important;
+  box-shadow: 0 10px 28px rgba(63, 81, 68, .1) !important;
+  gap: .38rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] div[data-testid="column"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="element-container"]:has(.fixed-suggestions-anchor) ~ div[data-testid="stHorizontalBlock"] div[data-testid="column"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] div[data-testid="stColumn"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="element-container"]:has(.fixed-suggestions-anchor) ~ div[data-testid="stHorizontalBlock"] div[data-testid="stColumn"] {
+  min-width: 0 !important;
+  padding: 0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="element-container"]:has(.fixed-suggestions-anchor) + div[data-testid="stHorizontalBlock"] button,
+.stApp:has(.product-shell.chat-stage) div[data-testid="element-container"]:has(.fixed-suggestions-anchor) ~ div[data-testid="stHorizontalBlock"] button {
+  min-height: 2rem !important;
+  padding: .25rem .58rem !important;
+  border: 1px solid rgba(63, 81, 68, .18) !important;
+  border-radius: 999px !important;
+  background: #edf5e8 !important;
+  color: #2f3f34 !important;
+  box-shadow: none !important;
+  font-size: .8rem !important;
+  font-weight: 760 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] textarea::placeholder {
+  color: #71836f !important;
+  opacity: 1 !important;
+}
+
+/* Strata fixed quick-answer row v11 */
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-fixed_quick_"]) {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 6.15rem !important;
+  z-index: 1199 !important;
+  width: var(--composer-width) !important;
+  max-width: var(--composer-width) !important;
+  height: auto !important;
+  margin: 0 auto !important;
+  padding: .38rem .44rem !important;
+  border: 1px solid rgba(63, 81, 68, .18) !important;
+  border-radius: 18px !important;
+  background: rgba(222, 236, 215, .96) !important;
+  box-shadow: 0 10px 28px rgba(63, 81, 68, .1) !important;
+  gap: .38rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-fixed_quick_"]) div[data-testid="stColumn"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-fixed_quick_"]) div[data-testid="column"] {
+  min-width: 0 !important;
+  padding: 0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-fixed_quick_"]) div[data-testid="stButton"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-fixed_quick_"]) div[data-testid="stElementContainer"] {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-fixed_quick_"]) button {
+  min-height: 2rem !important;
+  padding: .25rem .58rem !important;
+  border: 1px solid rgba(63, 81, 68, .18) !important;
+  border-radius: 999px !important;
+  background: #edf5e8 !important;
+  color: #2f3f34 !important;
+  box-shadow: none !important;
+  font-size: .8rem !important;
+  font-weight: 760 !important;
+}
+
+/* Strata compact quick-answer row v12 */
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-fixed_quick_"]) {
+  bottom: 5.92rem !important;
+  min-height: 0 !important;
+  padding: .28rem .34rem !important;
+  border-color: rgba(63, 81, 68, .12) !important;
+  border-radius: 14px !important;
+  background: rgba(229, 239, 224, .72) !important;
+  box-shadow: 0 8px 20px rgba(63, 81, 68, .07) !important;
+  gap: .28rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-fixed_quick_"]) button {
+  min-height: 1.62rem !important;
+  height: 1.62rem !important;
+  padding: .12rem .46rem !important;
+  border-color: rgba(63, 81, 68, .12) !important;
+  background: rgba(244, 249, 241, .88) !important;
+  color: #3a4a3e !important;
+  font-size: .72rem !important;
+  font-weight: 720 !important;
+  line-height: 1 !important;
+}
+
+/* Strata transparent chat input internals v13 */
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] [data-baseweb="textarea"],
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] [data-baseweb="base-input"],
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] [class*="st-"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] textarea,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] textarea:hover,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] textarea:focus,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] textarea:active {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] [data-baseweb="textarea"]::before,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] [data-baseweb="textarea"]::after,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] [data-baseweb="base-input"]::before,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] [data-baseweb="base-input"]::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Strata final chat clearance v14 */
+.stApp:has(.product-shell.chat-stage) [data-testid="stBottom"],
+.stApp:has(.product-shell.chat-stage) [data-testid="stBottomBlockContainer"],
+.stApp:has(.product-shell.chat-stage) [data-testid="stBottom"] > div,
+.stApp:has(.product-shell.chat-stage) [data-testid="stBottomBlockContainer"] > div,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] > div,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] > div > div,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] section,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] form {
+  background: transparent !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stBottom"]::before,
+.stApp:has(.product-shell.chat-stage) [data-testid="stBottom"]::after,
+.stApp:has(.product-shell.chat-stage) [data-testid="stBottomBlockContainer"]::before,
+.stApp:has(.product-shell.chat-stage) [data-testid="stBottomBlockContainer"]::after,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"]::before,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"]::after {
+  display: none !important;
+  content: none !important;
+  background: transparent !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] {
+  background: rgba(214, 229, 207, .98) !important;
+  background-color: rgba(214, 229, 207, .98) !important;
+}
+
+.stApp:has(.product-shell.chat-stage) .block-container {
+  padding-bottom: 15rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) .chat-end-spacer {
+  height: 13.5rem !important;
+  min-height: 13.5rem !important;
+}
+
+/* Strata compact input and hard bottom clearance v15 */
+.stApp:has(.product-shell.chat-stage) [data-testid="stBottom"] {
+  height: 4rem !important;
+  min-height: 4rem !important;
+  padding: 0 0 .72rem !important;
+  background: transparent !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stBottomBlockContainer"] {
+  height: 3.1rem !important;
+  min-height: 3.1rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] {
+  height: 3.05rem !important;
+  min-height: 3.05rem !important;
+  max-height: 3.05rem !important;
+  padding: .22rem .42rem !important;
+  border-radius: 999px !important;
+  background: rgba(214, 229, 207, .98) !important;
+  background-color: rgba(214, 229, 207, .98) !important;
+  overflow: hidden !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] textarea {
+  height: 2.1rem !important;
+  min-height: 2.1rem !important;
+  max-height: 2.1rem !important;
+  line-height: 2.1rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button {
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  min-width: 2.25rem !important;
+  min-height: 2.25rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-fixed_quick_"]) {
+  bottom: 4.35rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) .chat-end-spacer {
+  display: block !important;
+  height: 24rem !important;
+  min-height: 24rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) #chat-scroll-anchor {
+  display: block !important;
+  height: 12rem !important;
+  min-height: 12rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) .block-container {
+  padding-bottom: 24rem !important;
+  overflow-y: auto !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stVerticalBlock"]:has(.chat-end-spacer) {
+  padding-bottom: 18rem !important;
+}
+
+/* Strata centered compact input v16 */
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] {
+  display: flex !important;
+  align-items: center !important;
+  height: 3.05rem !important;
+  min-height: 3.05rem !important;
+  padding: .22rem .42rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] > div,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] > div > div,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] [data-baseweb="textarea"],
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] [data-baseweb="base-input"] {
+  height: 2.25rem !important;
+  min-height: 2.25rem !important;
+  display: flex !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] textarea {
+  height: 2.25rem !important;
+  min-height: 2.25rem !important;
+  max-height: 2.25rem !important;
+  line-height: 2.25rem !important;
+  padding: 0 .15rem !important;
+  margin: 0 !important;
+  transform: translateY(-1px);
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button {
+  align-self: center !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  min-width: 2.25rem !important;
+  min-height: 2.25rem !important;
+  max-height: 2.25rem !important;
+  margin: 0 .08rem 0 .35rem !important;
+  padding: 0 !important;
+  transform: translateY(0) !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button svg {
+  width: 1.05rem !important;
+  height: 1.05rem !important;
+}
+
+/* Strata usable compact input v17 */
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] {
+  display: block !important;
+  height: 3.05rem !important;
+  min-height: 3.05rem !important;
+  max-height: 3.05rem !important;
+  padding: .32rem .48rem !important;
+  overflow: hidden !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] > div {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  height: 2.4rem !important;
+  min-height: 2.4rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] > div > div:first-child,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] [data-baseweb="textarea"],
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] [data-baseweb="base-input"] {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: 2.4rem !important;
+  min-height: 2.4rem !important;
+  max-height: 2.4rem !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] textarea {
+  width: 100% !important;
+  min-width: 100% !important;
+  height: 2.4rem !important;
+  min-height: 2.4rem !important;
+  max-height: 2.4rem !important;
+  line-height: 2.4rem !important;
+  padding: 0 .35rem !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  resize: none !important;
+  white-space: nowrap !important;
+  transform: none !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] textarea::placeholder {
+  white-space: nowrap !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button {
+  flex: 0 0 2.25rem !important;
+  align-self: center !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  min-width: 2.25rem !important;
+  min-height: 2.25rem !important;
+  max-width: 2.25rem !important;
+  max-height: 2.25rem !important;
+  margin: 0 0 0 .45rem !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button svg {
+  width: 1.05rem !important;
+  height: 1.05rem !important;
+}
+
+/* Strata chat input layout repair v18 */
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] > div {
+  justify-content: stretch !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] > div > div {
+  width: 100% !important;
+  max-width: none !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: stretch !important;
+  margin: 0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] > div > div > div {
+  min-width: 0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] > div > div > div:first-child {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] > div > div > div:last-child {
+  flex: 0 0 2.25rem !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  align-self: center !important;
+  margin-left: .45rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] [data-baseweb="textarea"],
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] [data-baseweb="base-input"],
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] textarea {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button[data-testid="stChatInputSubmitButton"] {
+  position: static !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  margin: 0 !important;
+  flex: 0 0 2.25rem !important;
+}
+
+/* Strata chat input hard repair v19 */
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] {
+  position: relative !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] div:has(textarea[data-testid="stChatInputTextArea"]) {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] div:has(> textarea[data-testid="stChatInputTextArea"]),
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] [data-baseweb="textarea"],
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] [data-baseweb="base-input"] {
+  width: calc(100% - 3.15rem) !important;
+  max-width: calc(100% - 3.15rem) !important;
+  min-width: 0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] textarea[data-testid="stChatInputTextArea"] {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: 2.35rem !important;
+  min-height: 2.35rem !important;
+  max-height: 2.35rem !important;
+  line-height: 2.35rem !important;
+  padding: 0 .55rem !important;
+  overflow: hidden !important;
+  resize: none !important;
+  white-space: nowrap !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button[data-testid="stChatInputSubmitButton"] {
+  position: absolute !important;
+  right: .58rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  min-width: 2.25rem !important;
+  min-height: 2.25rem !important;
+  max-width: 2.25rem !important;
+  max-height: 2.25rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Strata send button state color v20 */
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button[data-testid="stChatInputSubmitButton"] {
+  background: #9fb89a !important;
+  color: #f8fbf5 !important;
+  border: 1px solid rgba(63, 81, 68, .16) !important;
+  opacity: 1 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button[data-testid="stChatInputSubmitButton"]:disabled,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button[data-testid="stChatInputSubmitButton"][disabled],
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button[data-testid="stChatInputSubmitButton"][aria-disabled="true"] {
+  background: #b8ccb2 !important;
+  color: rgba(63, 81, 68, .58) !important;
+  border-color: rgba(63, 81, 68, .12) !important;
+  opacity: 1 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button[data-testid="stChatInputSubmitButton"]:not(:disabled):not([aria-disabled="true"]) {
+  background: #3f664b !important;
+  color: #fffaf0 !important;
+  border-color: rgba(32, 27, 21, .18) !important;
+}
+
+/* Strata chat-stage backtest action v21 */
+.stApp:has(.product-shell.chat-stage) div[data-testid="stButton"]:has(button[kind="primary"]) {
+  width: min(720px, calc(100vw - 22rem)) !important;
+  margin: .75rem auto 1rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stButton"]:has(button[kind="primary"]) button {
+  min-height: 2.7rem !important;
+  border-radius: 999px !important;
+  background: #3f664b !important;
+  color: #fffaf0 !important;
+  border: 1px solid rgba(32, 27, 21, .18) !important;
+  box-shadow: none !important;
+  font-weight: 850 !important;
+}
+
+/* Strata strategy confirmation buttons v22 */
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-create_strategy_prototype"]) {
+  width: min(520px, calc(100vw - 22rem)) !important;
+  margin: .35rem auto .75rem !important;
+  gap: .55rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-create_strategy_prototype"]) div[data-testid="stColumn"] {
+  padding: 0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-create_strategy_prototype"]) div[data-testid="stButton"] {
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-create_strategy_prototype"]) button {
+  min-height: 2.05rem !important;
+  height: 2.05rem !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  font-size: .82rem !important;
+  font-weight: 760 !important;
+  padding: 0 .9rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [class*="st-key-create_strategy_prototype"] button {
+  background: #dcebd6 !important;
+  color: #2f563b !important;
+  border: 1px solid rgba(63, 102, 75, .18) !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [class*="st-key-continue_strategy_interview"] button {
+  background: rgba(248, 250, 241, .86) !important;
+  color: rgba(47, 86, 59, .82) !important;
+  border: 1px solid rgba(63, 102, 75, .14) !important;
+}
+
+/* Strata strategy confirmation buttons alignment v23 */
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-create_strategy_prototype"]) {
+  width: min(420px, calc(100vw - 28rem)) !important;
+  margin: .35rem 0 .9rem max(4.75rem, calc((100% - 720px) / 2 + 5rem)) !important;
+  align-items: stretch !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-create_strategy_prototype"]) div[data-testid="stColumn"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-create_strategy_prototype"]) div[data-testid="stButton"],
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-create_strategy_prototype"]) div[data-testid="stButton"] > div {
+  height: 2.05rem !important;
+  min-height: 2.05rem !important;
+}
+
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-create_strategy_prototype"]) button,
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-create_strategy_prototype"]) button > div,
+.stApp:has(.product-shell.chat-stage) div[data-testid="stHorizontalBlock"]:has([class*="st-key-create_strategy_prototype"]) button p {
+  height: 2.05rem !important;
+  min-height: 2.05rem !important;
+  line-height: 2.05rem !important;
+  margin: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Strata backtest workspace v24 */
+.transition-stage,
+.backtest-stage {
+  width: min(1120px, calc(100vw - 5rem));
+  margin: 1.5rem auto 4rem;
+}
+
+.stApp:has(.transition-stage) .workflow-rail {
+  z-index: 12;
+}
+
+.stApp:has(.transition-stage) .block-container {
+  min-height: 100dvh !important;
+}
+
+.stApp:has(.transition-stage) [data-testid="stChatMessage"],
+.stApp:has(.transition-stage) .strategy-stage,
+.stApp:has(.transition-stage) .backtest-stage {
+  display: none !important;
+}
+
+.stApp:has(.transition-stage) .transition-stage {
+  position: fixed;
+  inset: 0 0 0 168px;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  width: auto;
+  margin: 0;
+  padding: clamp(1.5rem, 4vw, 4rem);
+  background:
+    linear-gradient(rgba(229, 222, 204, .42) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(229, 222, 204, .42) 1px, transparent 1px),
+    #f8f5ec;
+  background-size: 120px 120px;
+}
+
+.transition-card {
+  width: min(880px, 82vw);
+  min-height: 34vh;
+  display: grid;
+  align-content: center;
+  gap: 1.3rem;
+  padding: 3rem;
+  border: 1.5px solid rgba(42, 45, 35, .24);
+  border-radius: 24px;
+  background: rgba(238, 246, 229, .74);
+  box-shadow: 10px 10px 0 rgba(42, 45, 35, .10);
+}
+
+.transition-card span {
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  color: rgba(63, 102, 75, .82);
+}
+
+.transition-card h2 {
+  margin: 0;
+  color: #1f2b21;
+  font-size: clamp(2.7rem, 6vw, 5.8rem);
+  line-height: .98;
+}
+
+.transition-card p {
+  max-width: 34rem;
+  margin: 0;
+  color: rgba(38, 47, 39, .68);
+  font-weight: 650;
+}
+
+.transition-progress {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  border: 1px solid rgba(31, 43, 33, .16);
+  background: rgba(31, 43, 33, .12);
+}
+
+.transition-progress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #3f664b;
+  transition: width .24s ease;
+}
+
+.backtest-panel {
+  padding: 2rem;
+  border: 1.5px solid rgba(42, 45, 35, .22);
+  border-radius: 24px;
+  background: rgba(250, 247, 238, .86);
+  box-shadow: 10px 10px 0 rgba(42, 45, 35, .10);
+}
+
+.factor-brief {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .75rem;
+  margin: .8rem 0 1.25rem;
+}
+
+.factor-brief div {
+  min-height: 6rem;
+  padding: .9rem;
+  border: 1px solid rgba(63, 102, 75, .18);
+  border-radius: 18px;
+  background: rgba(221, 236, 212, .58);
+}
+
+.factor-brief span {
+  display: block;
+  margin-bottom: .35rem;
+  color: rgba(48, 72, 53, .62);
+  font-size: .75rem;
+  font-weight: 800;
+}
+
+.factor-brief strong {
+  display: block;
+  color: #243528;
+  font-size: .95rem;
+  line-height: 1.5;
+}
+
+.stApp:has(.backtest-workbench-marker) div[data-testid="stTabs"] button {
+  border-radius: 999px !important;
+  font-weight: 800 !important;
+}
+
+.stApp:has(.post-backtest-actions-marker) div[data-testid="stHorizontalBlock"]:has([class*="st-key-save_backtested_strategy"]) {
+  margin: 1rem 0 .75rem !important;
+  padding: .65rem !important;
+  border: 1px solid rgba(63, 102, 75, .16);
+  border-radius: 18px;
+  background: rgba(221, 236, 212, .36);
+}
+
+.stApp:has(.post-backtest-actions-marker) [class*="st-key-save_backtested_strategy"] button,
+.stApp:has(.post-backtest-actions-marker) [class*="st-key-continue_chat_refine_strategy"] button {
+  min-height: 2.35rem !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  font-weight: 800 !important;
+}
+
+.stApp:has(.post-backtest-actions-marker) [class*="st-key-save_backtested_strategy"] button {
+  background: #3f664b !important;
+  color: #fffaf0 !important;
+}
+
+.stApp:has(.post-backtest-actions-marker) [class*="st-key-continue_chat_refine_strategy"] button {
+  background: rgba(248, 250, 241, .92) !important;
+  color: #2f563b !important;
+  border: 1px solid rgba(63, 102, 75, .18) !important;
+}
+
+@media (max-width: 900px) {
+  .transition-stage,
+  .backtest-stage {
+    width: min(100% - 1.5rem, 720px);
+  }
+
+  .factor-brief {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Strata account/dashboard readability v25 */
+.stApp button,
+.stApp button p,
+.stApp button span,
+.stApp button div {
+  color: inherit !important;
+}
+
+.stApp button[kind="primary"],
+.stApp button[data-testid="baseButton-primary"],
+.stApp button[data-testid="stBaseButton-primary"],
+.stApp button[data-testid="stBaseButton-primaryFormSubmit"],
+.stApp button[data-testid="stChatInputSubmitButton"]:not(:disabled):not([aria-disabled="true"]) {
+  background: #1f211c !important;
+  border-color: #1f211c !important;
+  color: #fffaf0 !important;
+}
+
+.stApp button[kind="primary"] *,
+.stApp button[data-testid="baseButton-primary"] *,
+.stApp button[data-testid="stBaseButton-primary"] *,
+.stApp button[data-testid="stBaseButton-primaryFormSubmit"] *,
+.stApp button[data-testid="stChatInputSubmitButton"]:not(:disabled):not([aria-disabled="true"]) * {
+  color: #fffaf0 !important;
+  fill: #fffaf0 !important;
+}
+
+.stApp button[kind="secondary"],
+.stApp button[data-testid="baseButton-secondary"],
+.stApp button[data-testid="stBaseButton-secondary"] {
+  background: rgba(248, 250, 241, .94) !important;
+  border-color: rgba(42, 45, 35, .2) !important;
+  color: #1f2b21 !important;
+}
+
+.stApp button[kind="secondary"] *,
+.stApp button[data-testid="baseButton-secondary"] *,
+.stApp button[data-testid="stBaseButton-secondary"] * {
+  color: #1f2b21 !important;
+}
+
+.stApp h1,
+.stApp h2,
+.stApp h3,
+.stApp h4,
+.stApp label,
+.stApp [data-testid="stMarkdownContainer"] h1,
+.stApp [data-testid="stMarkdownContainer"] h2,
+.stApp [data-testid="stMarkdownContainer"] h3 {
+  color: #1f211c !important;
+}
+
+.stApp:has(.account-dashboard-marker) {
+  color: #1f211c;
+}
+
+.stApp:has(.account-dashboard-marker) .block-container {
+  max-width: 980px !important;
+  padding-top: 3rem !important;
+}
+
+.account-stage {
+  width: min(980px, calc(100vw - 7rem));
+  margin: 0 auto 4rem;
+}
+
+.account-panel {
+  padding: 0;
+}
+
+.account-dashboard {
+  display: grid;
+  gap: .7rem;
+  margin: .65rem 0 .85rem;
+}
+
+.account-card,
+.account-record-card,
+.account-empty {
+  border: 1px solid rgba(42, 45, 35, .14);
+  border-radius: 12px;
+  background: rgba(255, 255, 252, .86);
+  box-shadow: 0 1px 2px rgba(31, 33, 28, .04), 0 8px 24px rgba(31, 33, 28, .04);
+}
+
+.account-overview-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .95rem 1rem;
+}
+
+.account-user {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+}
+
+.account-user-main {
+  min-width: 0;
+}
+
+.account-avatar {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #1f211c;
+  color: #fffaf0;
+  font-weight: 850;
+}
+
+.account-user strong {
+  display: block;
+  color: #1f211c;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.account-user span {
+  color: rgba(31, 33, 28, .58);
+  font-size: .82rem;
+}
+
+.account-status {
+  display: inline-flex;
+  align-items: center;
+  gap: .38rem;
+  color: #2f6f44;
+  font-size: .78rem;
+  font-weight: 750;
+}
+
+.account-status i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3f8f59;
+}
+
+.account-overview-meta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: .45rem;
+  flex-wrap: wrap;
+}
+
+.account-overview-meta > div {
+  min-height: 2.15rem;
+  display: inline-flex;
+  align-items: center;
+  gap: .38rem;
+  padding: .36rem .58rem;
+  border: 1px solid rgba(42, 45, 35, .12);
+  border-radius: 999px;
+  background: rgba(244, 250, 239, .72);
+  color: rgba(31, 33, 28, .68);
+  font-size: .72rem;
+  font-weight: 760;
+}
+
+.account-overview-meta b {
+  color: #1f211c;
+  font-size: .9rem;
+  line-height: 1;
+}
+
+.stApp:has(.account-dashboard-marker) div[data-testid="stHorizontalBlock"]:has([class*="st-key-logout_account"]),
+.stApp:has(.account-dashboard-marker) div[data-testid="stHorizontalBlock"]:has([class*="st-key-account_back_to_chat"]) {
+  margin: .65rem 0 1.2rem !important;
+}
+
+.stApp:has(.account-dashboard-marker) [class*="st-key-logout_account"] button,
+.stApp:has(.account-dashboard-marker) [class*="st-key-account_back_to_chat"] button {
+  min-height: 2.35rem !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  font-weight: 760 !important;
+}
+
+.stApp:has(.account-dashboard-marker) [class*="st-key-logout_account"] button {
+  background: #fff7f5 !important;
+  border: 1px solid rgba(166, 54, 54, .22) !important;
+  color: #9c2f2f !important;
+}
+
+.stApp:has(.account-dashboard-marker) [class*="st-key-account_back_to_chat"] button {
+  background: #edf6ea !important;
+  border: 1px solid rgba(58, 109, 72, .24) !important;
+  color: #244a31 !important;
+}
+
+.stApp:has(.account-dashboard-marker) [class*="st-key-account_back_to_chat"] button * {
+  color: #244a31 !important;
+}
+
+.account-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1.05rem 0 .65rem;
+}
+
+.account-section-title h3 {
+  margin: 0;
+  color: #1f211c;
+  font-size: 1rem;
+}
+
+.account-section-title span {
+  color: rgba(31, 33, 28, .56);
+  font-size: .78rem;
+  font-weight: 700;
+}
+
+.account-record-card {
+  display: grid;
+  gap: .58rem;
+  padding: .9rem 1rem .8rem;
+  margin-bottom: .5rem;
+}
+
+.record-topline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: .75rem;
+}
+
+.record-topline strong {
+  color: #1f211c;
+  font-size: .92rem;
+  line-height: 1.35;
+}
+
+.record-topline span {
+  flex: 0 0 auto;
+  padding: .16rem .48rem;
+  border-radius: 999px;
+  background: #eef7ee;
+  color: #2f6f44;
+  font-size: .68rem;
+  font-weight: 800;
+}
+
+.account-record-card.running {
+  border-color: rgba(210, 143, 49, .38);
+  background: rgba(255, 249, 232, .88);
+}
+
+.record-topline .record-status.running {
+  background: #fff3cf;
+  color: #9a620f;
+}
+
+.record-topline .record-status.running::before {
+  content: "";
+  display: inline-block;
+  width: .42rem;
+  height: .42rem;
+  margin-right: .32rem;
+  border-radius: 50%;
+  background: #d28f31;
+  box-shadow: 0 0 0 4px rgba(210, 143, 49, .16);
+}
+
+.record-description {
+  margin: -.1rem 0 .05rem;
+  color: rgba(31, 33, 28, .72);
+  font-size: .76rem;
+  line-height: 1.55;
+}
+
+.record-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+}
+
+.record-tags span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.45rem;
+  padding: .18rem .48rem;
+  border-radius: 999px;
+  background: rgba(237, 246, 234, .76);
+  color: rgba(31, 33, 28, .74);
+  font-size: .68rem;
+  font-weight: 760;
+}
+
+.record-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .45rem;
+}
+
+.record-metrics > div {
+  padding: .48rem .55rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 252, .72);
+  border: 1px solid rgba(42, 45, 35, .1);
+}
+
+.record-metrics span {
+  display: block;
+  color: rgba(31, 33, 28, .52);
+  font-size: .66rem;
+  font-weight: 760;
+}
+
+.record-metrics b {
+  display: block;
+  margin-top: .12rem;
+  color: #1f211c;
+  font-size: .9rem;
+  line-height: 1.1;
+}
+
+.record-metrics b.pos {
+  color: #2f6f44;
+}
+
+.record-metrics b.neg {
+  color: #9c2f2f;
+}
+
+.stApp:has(.account-dashboard-marker) [class*="st-key-record_edit_"] button,
+.stApp:has(.account-dashboard-marker) [class*="st-key-live_connect_"] button,
+.stApp:has(.account-dashboard-marker) [class*="st-key-record_delete_"] button {
+  min-height: 2.15rem !important;
+  margin: -.15rem 0 .75rem !important;
+  border-radius: 8px !important;
+  background: rgba(255, 255, 252, .9) !important;
+  border: 1px solid rgba(42, 45, 35, .18) !important;
+  color: #1f211c !important;
+  box-shadow: none !important;
+  font-weight: 760 !important;
+  letter-spacing: 0 !important;
+}
+
+.stApp:has(.account-dashboard-marker) [class*="st-key-live_connect_"] button {
+  background: #edf6ea !important;
+  border-color: rgba(58, 109, 72, .28) !important;
+  color: #244a31 !important;
+}
+
+.stApp:has(.account-dashboard-marker) [class*="st-key-live_connect_"] button * {
+  color: #244a31 !important;
+}
+
+.stApp:has(.account-dashboard-marker) [class*="st-key-record_delete_"] button {
+  background: #fff7f5 !important;
+  border-color: rgba(166, 54, 54, .22) !important;
+  color: #9c2f2f !important;
+}
+
+.stApp:has(.account-dashboard-marker) [class*="st-key-record_delete_"] button * {
+  color: #9c2f2f !important;
+}
+
+.stApp div[data-testid="stDialog"] {
+  color: #1f211c !important;
+}
+
+.stApp div[data-testid="stDialog"] div[data-testid="stForm"],
+.stApp div[data-testid="stDialog"] div[data-testid="stForm"] > div {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.stApp div[data-testid="stDialog"] input,
+.stApp div[data-testid="stDialog"] textarea {
+  background: rgba(255, 255, 252, .94) !important;
+  border: 1px solid rgba(42, 45, 35, .2) !important;
+  color: #1f211c !important;
+  box-shadow: none !important;
+}
+
+.stApp div[data-testid="stDialog"] button {
+  min-height: 2.25rem !important;
+  border-radius: 8px !important;
+  font-weight: 760 !important;
+}
+
+.stApp div[data-testid="stDialog"] [class*="st-key-confirm_delete_"] button {
+  background: #9c2f2f !important;
+  border-color: #9c2f2f !important;
+  color: #fffaf0 !important;
+}
+
+.live-stage {
+  width: min(980px, calc(100vw - 7rem));
+  margin: 0 auto 4rem;
+}
+
+.live-dashboard {
+  margin: .75rem 0 1.1rem;
+}
+
+.live-hero-card {
+  display: grid;
+  gap: .75rem;
+  padding: 1.35rem;
+  border: 1px solid rgba(210, 143, 49, .32);
+  border-radius: 14px;
+  background: rgba(255, 249, 232, .88);
+  box-shadow: 0 1px 2px rgba(31, 33, 28, .04), 0 8px 24px rgba(31, 33, 28, .04);
+}
+
+.live-hero-card span {
+  color: #9a620f;
+  font-size: .76rem;
+  font-weight: 850;
+  letter-spacing: .03em;
+}
+
+.live-hero-card h2 {
+  margin: 0;
+  color: #1f211c;
+  font-size: clamp(1.6rem, 3vw, 2.5rem);
+  line-height: 1.05;
+}
+
+.live-hero-card p {
+  max-width: 52rem;
+  margin: 0;
+  color: rgba(31, 33, 28, .68);
+  font-weight: 650;
+}
+
+.stApp:has(.live-dashboard-marker) .block-container {
+  max-width: 1040px !important;
+  padding-top: 3rem !important;
+}
+
+.stApp:has(.live-dashboard-marker) div[data-testid="stSelectbox"] label,
+.stApp:has(.live-dashboard-marker) div[data-testid="stTextInput"] label,
+.stApp:has(.live-dashboard-marker) div[data-testid="stSlider"] label {
+  color: #1f211c !important;
+  font-weight: 780 !important;
+}
+
+.stApp:has(.live-dashboard-marker) input,
+.stApp:has(.live-dashboard-marker) [data-baseweb="select"] > div {
+  background: rgba(255, 255, 252, .9) !important;
+  color: #1f211c !important;
+  border-color: rgba(42, 45, 35, .18) !important;
+}
+
+.record-meta-line,
+.record-stats-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem .7rem;
+  color: rgba(31, 33, 28, .58);
+  font-size: .76rem;
+}
+
+.record-meta-line span {
+  white-space: nowrap;
+}
+
+.record-stats-line b {
+  color: #1f211c;
+}
+
+.record-stats-line b.pos {
+  color: #2f6f44;
+}
+
+.record-stats-line b.neg {
+  color: #b64242;
+}
+
+.account-empty {
+  padding: 1rem;
+  color: rgba(31, 33, 28, .62);
+  font-weight: 650;
+}
+
+@media (max-width: 900px) {
+  .account-stage {
+    width: min(100% - 1.5rem, 720px);
+  }
+
+  .account-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Strata backtest compact workspace v27 */
+.stApp:has(.backtest-page-marker) .block-container {
+  max-width: 1120px !important;
+  padding-top: 1.15rem !important;
+  padding-bottom: 1.5rem !important;
+}
+
+.stApp:has(.backtest-page-marker) h2,
+.stApp:has(.backtest-page-marker) [data-testid="stMarkdownContainer"] h2 {
+  margin: 0 0 .7rem !important;
+  font-size: clamp(2rem, 3.6vw, 3.1rem) !important;
+  line-height: 1 !important;
+}
+
+.stApp:has(.backtest-page-marker) [data-testid="stMarkdownContainer"] h3 {
+  margin: .45rem 0 .55rem !important;
+  font-size: clamp(1.35rem, 2.5vw, 2rem) !important;
+}
+
+.stApp:has(.backtest-page-marker) .backtest-panel:empty,
+.stApp:has(.backtest-page-marker) .backtest-stage:empty {
+  display: none !important;
+}
+
+.stApp:has(.backtest-page-marker) .factor-brief {
+  gap: .55rem !important;
+  margin: .35rem 0 .75rem !important;
+}
+
+.stApp:has(.backtest-page-marker) .factor-brief div {
+  min-height: 4.45rem !important;
+  padding: .68rem .78rem !important;
+  border-radius: 14px !important;
+}
+
+.stApp:has(.backtest-page-marker) .factor-brief span {
+  margin-bottom: .22rem !important;
+  font-size: .7rem !important;
+}
+
+.stApp:has(.backtest-page-marker) .factor-brief strong {
+  font-size: .86rem !important;
+  line-height: 1.4 !important;
+}
+
+.stApp:has(.backtest-page-marker) div[data-testid="stSelectbox"],
+.stApp:has(.backtest-page-marker) div[data-testid="stCheckbox"] {
+  margin-bottom: .35rem !important;
+}
+
+.stApp:has(.backtest-page-marker) div[data-testid="stSelectbox"] label,
+.stApp:has(.backtest-page-marker) div[data-testid="stCheckbox"] label {
+  color: #1f211c !important;
+  font-weight: 800 !important;
+}
+
+.stApp:has(.backtest-page-marker) div[data-testid="stCheckbox"] label,
+.stApp:has(.backtest-page-marker) div[data-testid="stCheckbox"] p,
+.stApp:has(.backtest-page-marker) div[data-testid="stCheckbox"] span {
+  color: #1f211c !important;
+}
+
+.stApp:has(.backtest-page-marker) div[data-testid="stCheckbox"] svg {
+  fill: #1f211c !important;
+  color: #1f211c !important;
+}
+
+.stApp:has(.backtest-page-marker) [class*="st-key-"] button[kind="primary"],
+.stApp:has(.backtest-page-marker) div[data-testid="stButton"] button[kind="primary"] {
+  margin-top: .45rem !important;
+  min-height: 3rem !important;
+}
+
+.backtest-result-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .65rem;
+  margin: .45rem 0 .85rem;
+}
+
+.backtest-result-cards > div {
+  min-height: 5.35rem;
+  display: grid;
+  align-content: space-between;
+  gap: .35rem;
+  padding: .78rem .85rem;
+  border: 1px solid rgba(63, 102, 75, .18);
+  border-radius: 14px;
+  background: rgba(238, 246, 229, .74);
+  box-shadow: 0 1px 2px rgba(31, 33, 28, .04);
+}
+
+.backtest-result-cards span {
+  color: rgba(31, 33, 28, .62);
+  font-size: .72rem;
+  font-weight: 850;
+}
+
+.backtest-result-cards strong {
+  color: #24452e;
+  font-size: clamp(1.05rem, 2vw, 1.55rem);
+  line-height: 1.08;
+  font-weight: 920;
+}
+
+.backtest-result-cards em {
+  color: rgba(31, 33, 28, .68);
+  font-size: .74rem;
+  font-style: normal;
+  font-weight: 720;
+}
+
+.stApp:has(.backtest-page-marker) [data-testid="stMetric"],
+.stApp:has(.backtest-page-marker) [data-testid="stMetric"] * {
+  color: #24452e !important;
+}
+
+@media (max-width: 900px) {
+  .backtest-result-cards {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Strata landing auth actions v26 */
+.stApp:has(.landing-page) .landing-auth-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+}
+
+.stApp:has(.landing-page) .landing-auth-link,
+.stApp:has(.landing-page) .landing-auth-link:visited,
+.stApp:has(.landing-page) .landing-auth-link:hover,
+.stApp:has(.landing-page) .landing-auth-link:active {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 5.1rem;
+  padding: .55rem 1.25rem;
+  border: 1.5px solid rgba(91, 77, 52, .42);
+  border-radius: 999px;
+  background: #fff1bd;
+  color: #1f211c !important;
+  font-size: .88rem;
+  font-weight: 780;
+  line-height: 1;
+  text-decoration: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.stApp:has(.landing-page) .landing-auth-link:hover {
+  background: #ffe99a;
+}
+
+.stApp:has(.landing-page) [class*="st-key-landing_login_action"],
+.stApp:has(.landing-page) [class*="st-key-landing_register_action"] {
+  position: fixed !important;
+  top: clamp(1.45rem, 3.6vh, 2.15rem) !important;
+  z-index: 80 !important;
+  width: 5.6rem !important;
+  height: 2.65rem !important;
+}
+
+.stApp:has(.landing-page) [class*="st-key-landing_login_action"] {
+  right: clamp(9.2rem, 11vw, 12rem) !important;
+}
+
+.stApp:has(.landing-page) [class*="st-key-landing_register_action"] {
+  right: clamp(2.7rem, 5.3vw, 5.45rem) !important;
+}
+
+.stApp:has(.landing-page) [class*="st-key-landing_login_action"] > div,
+.stApp:has(.landing-page) [class*="st-key-landing_register_action"] > div,
+.stApp:has(.landing-page) [class*="st-key-landing_login_action"] div[data-testid="stButton"],
+.stApp:has(.landing-page) [class*="st-key-landing_register_action"] div[data-testid="stButton"] {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.stApp:has(.landing-page) [class*="st-key-landing_login_action"] button,
+.stApp:has(.landing-page) [class*="st-key-landing_register_action"] button {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 2.65rem !important;
+  padding: .45rem 1rem !important;
+  border: 1.5px solid rgba(91, 77, 52, .42) !important;
+  border-radius: 999px !important;
+  background: #fff1bd !important;
+  color: #1f211c !important;
+  font-size: .96rem !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+}
+
+.stApp:has(.landing-page) [class*="st-key-landing_login_action"] button *,
+.stApp:has(.landing-page) [class*="st-key-landing_register_action"] button * {
+  color: #1f211c !important;
+}
+
+.stApp:has(.landing-page) [class*="st-key-landing_login_action"] button:hover,
+.stApp:has(.landing-page) [class*="st-key-landing_register_action"] button:hover {
+  background: #ffe99a !important;
+  border-color: rgba(91, 77, 52, .55) !important;
+}
+
+/* Landing auth refinement v28 */
+.stApp:has(.landing-page) [class*="st-key-landing_login_action"] button,
+.stApp:has(.landing-page) [class*="st-key-landing_register_action"] button {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif !important;
+  color: var(--muted) !important;
+  font-size: .9rem !important;
+  font-weight: 850 !important;
+}
+
+.stApp:has(.landing-page) [class*="st-key-landing_login_action"] button *,
+.stApp:has(.landing-page) [class*="st-key-landing_register_action"] button * {
+  color: var(--muted) !important;
+}
+
+.stApp div[data-testid="stDialog"] > div {
+  max-width: 480px !important;
+}
+
+.stApp div[data-testid="stDialog"] div[role="dialog"] {
+  max-width: 480px !important;
+  padding: 1.15rem 1.25rem !important;
+}
+
+.stApp div[data-testid="stDialog"] h1,
+.stApp div[data-testid="stDialog"] h2,
+.stApp div[data-testid="stDialog"] h3 {
+  font-size: 1.35rem !important;
+  line-height: 1.2 !important;
+}
+
+.stApp div[data-testid="stDialog"] [data-testid="stVerticalBlock"] {
+  gap: .55rem !important;
+}
+

@@ -9,7 +9,11 @@ __pycache__/
 *.zip
 *.log
 .streamlit/secrets.toml
-demo/
+demo/.env
+demo/.env.local
+demo/DATASET/
+demo/**/__pycache__/
+demo/**/*.pyc
 local_data/
 local_artifacts/
 docs/learning_local/

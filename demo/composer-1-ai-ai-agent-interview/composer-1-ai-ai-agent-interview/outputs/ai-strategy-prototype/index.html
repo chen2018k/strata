@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Strata</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="stage" id="stage" data-step="landing">
+      <aside class="workflow-rail" aria-label="流程进度">
+        <div class="workflow-track"></div>
+        <div class="workflow-step" data-workflow-step="chat">
+          <span class="workflow-index">01</span>
+          <strong>对话</strong>
+          <em>了解习惯</em>
+        </div>
+        <div class="workflow-step" data-workflow-step="profile">
+          <span class="workflow-index">02</span>
+          <strong>分析</strong>
+          <em>生成画像</em>
+        </div>
+        <div class="workflow-step" data-workflow-step="backtest">
+          <span class="workflow-index">03</span>
+          <strong>回测</strong>
+          <em>查看表现</em>
+        </div>
+        <div class="workflow-step" data-workflow-step="account">
+          <span class="workflow-index">04</span>
+          <strong>账户</strong>
+          <em>保存应用</em>
+        </div>
+      </aside>
+
+      <section class="view landing-view is-active" id="landingView" aria-label="开场页面">
+        <div class="top-news">★ Strata preview · AI 策略生成与模拟回测</div>
+        <header class="site-nav" aria-label="导航">
+          <div class="wordmark">
+            <span class="mark-bars"></span>
+            <strong>Strata</strong>
+          </div>
+          <nav>
+            <a>AI 访谈</a>
+            <a>策略画像</a>
+            <a>模拟回测</a>
+          </nav>
+          <button class="nav-button" id="navStartButton">Try Strata</button>
+        </header>
+        <div class="market-visual" aria-hidden="true">
+          <div class="market-line line-one"></div>
+          <div class="market-line line-two"></div>
+          <div class="market-line line-three"></div>
+          <div class="color-block block-green"></div>
+          <div class="color-block block-pink"></div>
+          <div class="color-block block-cyan"></div>
+          <div class="color-block block-yellow"></div>
+          <div class="color-block block-lime"></div>
+          <div class="ticker-tile tile-one">A50</div>
+          <div class="ticker-tile tile-two">300</div>
+          <div class="ticker-tile tile-three">ETF</div>
+        </div>
+        <div class="landing-copy">
+          <p class="eyebrow">AI Strategy Studio</p>
+          <h1>Strata</h1>
+          <p class="tagline">把想法变成策略</p>
+          <button class="primary-button hero-button" id="startButton">开始使用</button>
+        </div>
+      </section>
+
+      <section class="view chat-view" id="chatView" aria-label="AI 访谈页面">
+        <div class="floating-edge landing-edge">Strata</div>
+        <article class="chat-card">
+          <header class="chat-head">
+            <div>
+              <p class="eyebrow">第一步</p>
+              <h2>先聊清楚你的投资习惯</h2>
+            </div>
+            <span class="status-pill">模拟模式</span>
+          </header>
+
+          <section class="advisor-card">
+            <div class="advisor-avatar">AI</div>
+            <div>
+              <strong>策略顾问</strong>
+              <p>我会用日常问题帮你梳理目标、节奏和边界。你不用懂术语，按直觉回答就好。</p>
+            </div>
+          </section>
+
+          <section class="chat-window" id="chatWindow" aria-live="polite"></section>
+
+          <form class="answer-bar" id="answerForm">
+            <input id="answerInput" type="text" autocomplete="off" placeholder="也可以直接输入你的想法..." />
+            <button type="submit" aria-label="发送">发送</button>
+          </form>
+
+          <div class="quick-replies" id="quickReplies" aria-label="快捷回答"></div>
+
+          <button class="primary-button model-button" id="generateModelButton" hidden>生成量化模型</button>
+        </article>
+      </section>
+
+      <section class="view profile-view" id="profileView" aria-label="用户画像与策略页面">
+        <div class="floating-edge chat-edge">访谈已完成</div>
+        <section class="profile-shell">
+          <article class="summary-band">
+            <div>
+              <p class="eyebrow">第二步</p>
+              <h2 id="intentTitle">等待访谈完成</h2>
+              <p id="intentCopy">完成访谈后，这里会生成一份容易检查的策略摘要。</p>
+            </div>
+            <div class="summary-actions">
+              <button class="ghost-button" id="refineButton" disabled>补充问答</button>
+              <button class="primary-button" id="goBacktestButton" disabled>确认，查看回测</button>
+            </div>
+          </article>
+
+          <div class="analysis-grid">
+            <article class="panel profile-panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">用户画像</p>
+                  <h3>你适合怎样的策略节奏</h3>
+                </div>
+                <span id="profileBadge" class="mini-badge">待生成</span>
+              </div>
+              <canvas id="radarChart" width="440" height="310" aria-label="用户画像雷达图"></canvas>
+              <div class="score-list" id="scoreList"></div>
+              <p class="plain-note">说明：分数不是好坏判断，只是帮助系统把策略调整到更贴近你的习惯。</p>
+            </article>
+
+            <article class="panel factor-panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">选股偏好</p>
+                  <h3>AI 生成的策略权重</h3>
+                </div>
+                <span class="mini-badge">可调整</span>
+              </div>
+              <div class="factor-stack" id="factorStack"></div>
+              <div class="rules-box" id="rulesBox">访谈完成后展示股票池、观察节奏与安全边界。</div>
+            </article>
+          </div>
+
+          <div class="page-actions" aria-hidden="true"></div>
+        </section>
+      </section>
+
+      <section class="view backtest-view" id="backtestView" aria-label="回测页面">
+        <div class="floating-edge profile-edge">画像与策略</div>
+        <section class="backtest-shell">
+          <article class="panel backtest-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">第三步</p>
+                <h2>看看这套策略过去表现如何</h2>
+                <p class="panel-subtitle">回测是历史模拟，不代表未来收益。它主要用来观察策略性格：涨得快不快、跌得深不深、交易是否太频繁。</p>
+              </div>
+              <div class="summary-actions">
+                <span class="mini-badge" id="yearBadge">默认 5 年</span>
+                <button class="primary-button" id="saveStrategyButton">保存策略</button>
+              </div>
+            </div>
+
+            <div class="range-box">
+              <div>
+                <strong>历史数据区间</strong>
+                <p>拖动滑块，比较更长时间里的策略表现。</p>
+              </div>
+              <label class="year-slider">
+                <input id="yearRange" type="range" min="0" max="2" step="1" value="0" />
+                <span class="range-labels"><b>5年</b><b>10年</b><b>15年</b></span>
+              </label>
+            </div>
+
+            <div class="metrics" id="metrics">
+              <div><span>年均收益</span><strong>--</strong><em>平均每年的模拟增长</em></div>
+              <div><span>最大下跌</span><strong>--</strong><em>历史最难熬的一段下跌</em></div>
+              <div><span>收益稳定度</span><strong>--</strong><em>越高代表波动越平顺</em></div>
+              <div><span>交易频率</span><strong>--</strong><em>数值越高，买卖越频繁</em></div>
+              <div><span>赚钱月份</span><strong>--</strong><em>上涨月份占全部月份的比例</em></div>
+              <div><span>分散程度</span><strong>--</strong><em>是否避免押在少数股票上</em></div>
+            </div>
+
+            <div class="charts">
+              <canvas id="returnChart" width="760" height="280" aria-label="累计收益曲线"></canvas>
+              <canvas id="barChart" width="360" height="280" aria-label="年度收益柱状图"></canvas>
+            </div>
+
+            <div class="execution-note">
+              <strong>当前只做模拟</strong>
+              <span>本原型不接入真实交易。后续如接入实盘，应通过具备相应资质的券商或投顾服务完成开户、适当性、授权、风控和交易留痕。</span>
+            </div>
+          </article>
+        </section>
+      </section>
+
+      <section class="view account-view" id="accountView" aria-label="我的账户页面">
+        <div class="floating-edge account-edge">我的账户</div>
+        <section class="account-shell">
+          <article class="account-header panel">
+            <div>
+              <p class="eyebrow">第四步</p>
+              <h2>我的账户</h2>
+              <p class="panel-subtitle">保存后的策略会出现在这里。勾选后，它将加入当前模拟策略组合。</p>
+            </div>
+            <button class="primary-button" id="applyStrategyButton">应用策略</button>
+          </article>
+
+          <div class="account-grid">
+            <article class="panel strategy-list-panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">策略列表</p>
+                  <h3>已保存策略</h3>
+                </div>
+                <span class="mini-badge">1 已启用</span>
+              </div>
+
+              <label class="strategy-item is-active">
+                <input type="checkbox" checked />
+                <span>
+                  <strong id="savedStrategyName">均衡多因子型 A 股策略</strong>
+                  <em>当前启用 · 月度观察 · 分散配置</em>
+                </span>
+                <b>15.4%</b>
+              </label>
+
+              <label class="strategy-item">
+                <input type="checkbox" />
+                <span>
+                  <strong>红利防守观察池</strong>
+                  <em>未启用 · 低波动 · 分红优先</em>
+                </span>
+                <b>9.8%</b>
+              </label>
+
+              <label class="strategy-item">
+                <input type="checkbox" />
+                <span>
+                  <strong>行业景气跟踪</strong>
+                  <em>未启用 · 成长弹性 · 波动偏高</em>
+                </span>
+                <b>18.2%</b>
+              </label>
+            </article>
+
+            <article class="panel account-overview-panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">账户概览</p>
+                  <h3>当前持仓与市场情况</h3>
+                </div>
+                <span class="mini-badge">模拟账户</span>
+              </div>
+
+              <div class="holding-metrics">
+                <div><span>账户资产</span><strong>¥128,640</strong></div>
+                <div><span>今日变化</span><strong>+1.26%</strong></div>
+                <div><span>现金占比</span><strong>18%</strong></div>
+                <div><span>策略仓位</span><strong>82%</strong></div>
+              </div>
+
+              <div class="holding-table" aria-label="当前投资持仓">
+                <div class="table-row table-head"><span>持仓</span><span>占比</span><span>今日</span></div>
+                <div class="table-row"><span>高股息组合</span><span>28%</span><span class="up">+0.8%</span></div>
+                <div class="table-row"><span>质量成长组合</span><span>24%</span><span class="up">+1.4%</span></div>
+                <div class="table-row"><span>低波动组合</span><span>18%</span><span class="down">-0.2%</span></div>
+                <div class="table-row"><span>现金</span><span>18%</span><span>--</span></div>
+              </div>
+
+              <div class="market-strip">
+                <div><span>沪深300</span><strong>+0.74%</strong></div>
+                <div><span>成交活跃度</span><strong>中等</strong></div>
+                <div><span>市场温度</span><strong>偏暖</strong></div>
+              </div>
+            </article>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
