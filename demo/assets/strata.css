@@ -3800,6 +3800,59 @@ body,
   color: var(--muted) !important;
 }
 
+/* Landing auth hit-area adjustment v29 */
+.stApp:has(.landing-page) [data-testid="stHeader"] {
+  pointer-events: none !important;
+}
+
+.stApp:has(.landing-page) [class*="st-key-landing_login_action"],
+.stApp:has(.landing-page) [class*="st-key-landing_register_action"] {
+  top: clamp(1.55rem, 3.8vh, 2.2rem) !important;
+  z-index: 10000 !important;
+  width: 4.9rem !important;
+  height: 2.28rem !important;
+  pointer-events: auto !important;
+}
+
+.stApp:has(.landing-page) [class*="st-key-landing_login_action"] {
+  right: clamp(8.8rem, 10.8vw, 11.7rem) !important;
+}
+
+.stApp:has(.landing-page) [class*="st-key-landing_register_action"] {
+  right: clamp(2.7rem, 5.3vw, 5.45rem) !important;
+}
+
+.stApp:has(.landing-page) [class*="st-key-landing_login_action"] > div,
+.stApp:has(.landing-page) [class*="st-key-landing_register_action"] > div,
+.stApp:has(.landing-page) [class*="st-key-landing_login_action"] div[data-testid="stButton"],
+.stApp:has(.landing-page) [class*="st-key-landing_register_action"] div[data-testid="stButton"] {
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: auto !important;
+}
+
+.stApp:has(.landing-page) [class*="st-key-landing_login_action"] button,
+.stApp:has(.landing-page) [class*="st-key-landing_register_action"] button {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 2.28rem !important;
+  padding: .28rem .62rem !important;
+  font-size: .98rem !important;
+  font-weight: 950 !important;
+  letter-spacing: .025em !important;
+  color: var(--ink) !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+.stApp:has(.landing-page) [class*="st-key-landing_login_action"] button *,
+.stApp:has(.landing-page) [class*="st-key-landing_register_action"] button * {
+  color: var(--ink) !important;
+  font-weight: 950 !important;
+  letter-spacing: .025em !important;
+  pointer-events: none !important;
+}
+
 .stApp div[data-testid="stDialog"] > div {
   max-width: 480px !important;
 }
