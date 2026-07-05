@@ -2966,7 +2966,7 @@ body,
 }
 
 .transition-card span {
-  font-size: .78rem;
+  font-size: .95rem;
   font-weight: 800;
   letter-spacing: .04em;
   color: rgba(63, 102, 75, .82);
@@ -2975,8 +2975,8 @@ body,
 .transition-card h2 {
   margin: 0;
   color: #1f2b21;
-  font-size: clamp(2.7rem, 6vw, 5.8rem);
-  line-height: .98;
+  font-size: 1.12rem;
+  line-height: 1.08;
 }
 
 .transition-card p {
@@ -3871,5 +3871,50 @@ body,
 
 .stApp div[data-testid="stDialog"] [data-testid="stVerticalBlock"] {
   gap: .55rem !important;
+}
+
+/* Strata chat send icon repair v24 */
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button[data-testid="stChatInputSubmitButton"] {
+  position: absolute !important;
+  font-size: 0 !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button[data-testid="stChatInputSubmitButton"] svg,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button[data-testid="stChatInputSubmitButton"] img,
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button[data-testid="stChatInputSubmitButton"] [data-testid="stIconMaterial"] {
+  display: none !important;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button[data-testid="stChatInputSubmitButton"]::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 54%;
+  width: .22rem;
+  height: .68rem;
+  border-radius: 999px;
+  background: rgba(63, 81, 68, .64);
+  transform: translate(-50%, -44%);
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button[data-testid="stChatInputSubmitButton"]::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  width: .62rem;
+  height: .62rem;
+  border-top: .22rem solid rgba(63, 81, 68, .64);
+  border-left: .22rem solid rgba(63, 81, 68, .64);
+  border-radius: .08rem;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button[data-testid="stChatInputSubmitButton"]:not(:disabled):not([aria-disabled="true"])::before {
+  background: #fffaf0;
+}
+
+.stApp:has(.product-shell.chat-stage) [data-testid="stChatInput"] button[data-testid="stChatInputSubmitButton"]:not(:disabled):not([aria-disabled="true"])::after {
+  border-color: #fffaf0;
 }
 
