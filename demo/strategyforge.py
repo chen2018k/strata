@@ -71,6 +71,17 @@ class StrategyVariant:
     description: str
 
 
+@dataclass(frozen=True)
+class StrategyParams:
+    fast_ma: int = 20
+    slow_ma: int = 60
+    rsi_entry: float = 30.0
+    rsi_exit: float = 55.0
+    max_hold_days: int = 20
+    stop_loss: float | None = None
+    cost_bps: float | None = None
+
+
 def load_symbols(dataset_dir: Path = DATASET_DIR) -> list[SymbolInfo]:
     metadata_path = dataset_dir / "metadata.json"
     if not metadata_path.exists():
@@ -214,25 +225,37 @@ def sharpe_ratio(returns: pd.Series, periods: int = 252) -> float:
     return float((returns.mean() / std) * np.sqrt(periods))
 
 
-def build_signals(df: pd.DataFrame, family: StrategyFamily, enhanced: bool, risk_profile: RiskProfile) -> pd.Series:
+def build_signals(
+    df: pd.DataFrame,
+    family: StrategyFamily,
+    enhanced: bool,
+    risk_profile: RiskProfile,
+    strategy_params: StrategyParams | None = None,
+) -> pd.Series:
     close = df["close"]
     params = risk_parameters(risk_profile)
+    strategy_params = strategy_params or StrategyParams()
+    fast_ma = int(strategy_params.fast_ma)
+    slow_ma = int(strategy_params.slow_ma)
+    rsi_entry = float(strategy_params.rsi_entry)
+    rsi_exit = float(strategy_params.rsi_exit)
+    max_hold_days = int(strategy_params.max_hold_days)
     position_size = float(params["position"])
-    stop_loss = float(params["stop_loss"])
+    stop_loss = float(strategy_params.stop_loss if strategy_params.stop_loss is not None else params["stop_loss"])
     cooldown_days = int(params["cooldown"])
 
     if family == "趋势跟踪":
-        base_signal = (close.rolling(20).mean() > close.rolling(60).mean()).astype(float)
+        base_signal = (close.rolling(fast_ma).mean() > close.rolling(slow_ma).mean()).astype(float)
     elif family == "均值回归":
         rsi_value = rsi(close)
         base_signal = pd.Series(0.0, index=df.index)
         holding = False
         hold_days = 0
         for idx in range(len(df)):
-            if not holding and rsi_value.iloc[idx] < 30:
+            if not holding and rsi_value.iloc[idx] < rsi_entry:
                 holding = True
                 hold_days = 0
-            elif holding and (rsi_value.iloc[idx] > 55 or hold_days >= 20):
+            elif holding and (rsi_value.iloc[idx] > rsi_exit or hold_days >= max_hold_days):
                 holding = False
                 hold_days = 0
             base_signal.iloc[idx] = 1.0 if holding else 0.0
@@ -248,7 +271,7 @@ def build_signals(df: pd.DataFrame, family: StrategyFamily, enhanced: bool, risk
             if not holding and price < lower.iloc[idx]:
                 holding = True
                 hold_days = 0
-            elif holding and (price > middle.iloc[idx] or price > upper.iloc[idx] or hold_days >= 18):
+            elif holding and (price > middle.iloc[idx] or price > upper.iloc[idx] or hold_days >= max_hold_days):
                 holding = False
                 hold_days = 0
             base_signal.iloc[idx] = 1.0 if holding else 0.0
@@ -256,13 +279,13 @@ def build_signals(df: pd.DataFrame, family: StrategyFamily, enhanced: bool, risk
                 hold_days += 1
     elif family == "多策略投票":
         lower, middle, _upper = bollinger_bands(close)
-        trend_signal = (close.rolling(20).mean() > close.rolling(60).mean()).astype(float)
-        rsi_signal = (rsi(close) < 35).astype(float)
+        trend_signal = (close.rolling(fast_ma).mean() > close.rolling(slow_ma).mean()).astype(float)
+        rsi_signal = (rsi(close) < rsi_entry + 5).astype(float)
         boll_signal = (close < lower).astype(float)
         base_signal = ((trend_signal + rsi_signal + boll_signal) >= 2).astype(float)
     else:
-        trend = (close.rolling(20).mean() > close.rolling(60).mean()).astype(float)
-        rsi_signal = (rsi(close) < 35).astype(float)
+        trend = (close.rolling(fast_ma).mean() > close.rolling(slow_ma).mean()).astype(float)
+        rsi_signal = (rsi(close) < rsi_entry + 5).astype(float)
         base_signal = ((trend + rsi_signal) >= 1).astype(float)
 
     signal = base_signal * position_size
@@ -299,11 +322,18 @@ def build_signals(df: pd.DataFrame, family: StrategyFamily, enhanced: bool, risk
     return protected.fillna(0.0)
 
 
-def backtest(df: pd.DataFrame, family: StrategyFamily, enhanced: bool, risk_profile: RiskProfile) -> pd.DataFrame:
+def backtest(
+    df: pd.DataFrame,
+    family: StrategyFamily,
+    enhanced: bool,
+    risk_profile: RiskProfile,
+    strategy_params: StrategyParams | None = None,
+) -> pd.DataFrame:
     result = df[["date", "close", "return"]].copy()
-    signal = build_signals(df, family, enhanced=enhanced, risk_profile=risk_profile)
+    strategy_params = strategy_params or StrategyParams()
+    signal = build_signals(df, family, enhanced=enhanced, risk_profile=risk_profile, strategy_params=strategy_params)
     position = signal.shift(1).fillna(0.0)
-    cost_bps = float(risk_parameters(risk_profile)["cost_bps"])
+    cost_bps = float(strategy_params.cost_bps if strategy_params.cost_bps is not None else risk_parameters(risk_profile)["cost_bps"])
     turnover = position.diff().abs().fillna(position.abs())
     cost = turnover * cost_bps / 10000
     result["position"] = position
@@ -471,12 +501,19 @@ def compare_variants(
     df: pd.DataFrame,
     variants: list[StrategyVariant],
     preferred_risk: RiskProfile,
+    strategy_params: StrategyParams | None = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, pd.DataFrame]]:
     rows = []
     curves = pd.DataFrame({"date": df["date"], "买入持有基准": (1 + df["return"]).cumprod()})
     backtests: dict[str, pd.DataFrame] = {}
     for variant in variants:
-        bt = backtest(df, variant.family, enhanced=variant.enhanced, risk_profile=variant.risk_profile)
+        bt = backtest(
+            df,
+            variant.family,
+            enhanced=variant.enhanced,
+            risk_profile=variant.risk_profile,
+            strategy_params=strategy_params,
+        )
         summary = summarize_backtest(bt)
         scores = score_summary(summary, preferred_risk)
         rows.append(

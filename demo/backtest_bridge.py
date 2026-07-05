@@ -14,6 +14,7 @@ try:
     from market_data import load_universe, preferred_benchmarks
     from strategyforge import (
         RiskProfile,
+        StrategyParams,
         StrategyFamily,
         StrategyVariant,
         compare_variants,
@@ -28,6 +29,7 @@ except ModuleNotFoundError:
     from .market_data import load_universe, preferred_benchmarks
     from .strategyforge import (
         RiskProfile,
+        StrategyParams,
         StrategyFamily,
         StrategyVariant,
         compare_variants,
@@ -56,8 +58,21 @@ class BacktestSpec:
     theme: str = ""
     user_factor: str = ""
     candidate_symbols: tuple[str, ...] = ()
+    candidate_reasons: tuple[tuple[str, str], ...] = ()
+    fast_ma: int = 20
+    slow_ma: int = 60
+    rsi_entry: float = 30.0
+    rsi_exit: float = 55.0
+    max_hold_days: int = 20
+    stop_loss: float | None = None
+    cost_bps: float | None = None
 
     def as_dict(self) -> dict[str, Any]:
+        candidate_payload: list[str | dict[str, str]]
+        if self.candidate_reasons:
+            candidate_payload = [{"symbol": symbol, "reason": reason} for symbol, reason in self.candidate_reasons]
+        else:
+            candidate_payload = list(self.candidate_symbols)
         return {
             "symbol_code": self.symbol_code,
             "benchmark_code": self.benchmark_code,
@@ -70,8 +85,28 @@ class BacktestSpec:
             "market": self.market,
             "theme": self.theme,
             "user_factor": self.user_factor,
-            "candidate_symbols": list(self.candidate_symbols),
+            "candidate_symbols": candidate_payload,
+            "strategy_params": {
+                "fast_ma": self.fast_ma,
+                "slow_ma": self.slow_ma,
+                "rsi_entry": self.rsi_entry,
+                "rsi_exit": self.rsi_exit,
+                "max_hold_days": self.max_hold_days,
+                "stop_loss": self.stop_loss,
+                "cost_bps": self.cost_bps,
+            },
         }
+
+    def strategy_params(self) -> StrategyParams:
+        return StrategyParams(
+            fast_ma=self.fast_ma,
+            slow_ma=self.slow_ma,
+            rsi_entry=self.rsi_entry,
+            rsi_exit=self.rsi_exit,
+            max_hold_days=self.max_hold_days,
+            stop_loss=self.stop_loss,
+            cost_bps=self.cost_bps,
+        )
 
 
 def _symbol_by_code(code: str):
@@ -123,7 +158,83 @@ THEME_CANDIDATES: tuple[tuple[tuple[str, ...], tuple[str, ...], str], ...] = (
 )
 
 
-def _infer_theme_and_candidates(text: str, fallback_code: str) -> tuple[str, tuple[str, ...]]:
+DEFAULT_CANDIDATE_REASONS: dict[str, str] = {
+    "NVDA": "GPU 与 AI 算力直接受益",
+    "AMD": "GPU/CPU 供给替代与 AI 服务器配置升级",
+    "AVGO": "AI 网络芯片与定制 ASIC",
+    "SMCI": "AI 服务器整机与机柜需求",
+    "DELL": "企业服务器与存储出货",
+    "ANET": "数据中心高速网络设备",
+    "VRT": "数据中心电力与散热",
+    "FCX": "铜矿供给和价格弹性",
+    "XLB": "材料板块 ETF 对照",
+    "CAT": "矿业与工程设备景气",
+    "DE": "机械设备与资本开支周期",
+    "ETN": "电力设备和电气化需求",
+    "GEV": "电网和电力基础设施",
+    "XOM": "综合能源龙头",
+    "CVX": "油气价格与能源现金流",
+    "SLB": "油服资本开支弹性",
+    "COP": "上游油气开采暴露",
+    "EOG": "页岩油气供给弹性",
+    "XLE": "能源行业 ETF 对照",
+    "JPM": "大型银行与利率环境",
+    "BAC": "零售银行与利率敏感性",
+    "WFC": "商业银行周期暴露",
+    "GS": "投行和资本市场活跃度",
+    "MS": "财富管理与资本市场",
+    "XLF": "金融行业 ETF 对照",
+    "AMZN": "线上消费与云业务双暴露",
+    "WMT": "必选零售需求韧性",
+    "COST": "会员制零售与消费韧性",
+    "HD": "地产后周期消费",
+    "MCD": "餐饮消费与价格传导",
+    "SBUX": "可选消费与门店流量",
+    "XLY": "可选消费 ETF 对照",
+    "LLY": "创新药景气与权重龙头",
+    "UNH": "医保服务与防御属性",
+    "JNJ": "综合医药防御资产",
+    "MRK": "大型药企管线与现金流",
+    "ABBV": "医药现金流与管线切换",
+    "XLV": "医疗行业 ETF 对照",
+    "2800.HK": "恒生指数宽基代表",
+    "3033.HK": "港股科技 ETF 代表",
+    "EWH": "香港市场 ETF 对照",
+    "MCHI": "中国大盘股票 ETF",
+    "FXI": "中国大盘龙头 ETF",
+    "ES3.SI": "新加坡 STI 宽基代表",
+    "CFA.SI": "新加坡宽基 ETF 代表",
+    "EWS": "新加坡市场 ETF 对照",
+}
+
+
+def _candidate_reason(symbol_code: str, theme: str) -> str:
+    return DEFAULT_CANDIDATE_REASONS.get(symbol_code, f"与 {theme or '用户观察'} 主题相关，可用于横向验证")
+
+
+def _candidate_reason_pairs(candidates: tuple[str, ...], theme: str) -> tuple[tuple[str, str], ...]:
+    return tuple((code, _candidate_reason(code, theme)) for code in candidates)
+
+
+def _parse_candidate_payload(raw_candidates: Any, codes: set[str], theme: str) -> tuple[tuple[str, ...], tuple[tuple[str, str], ...]]:
+    symbols: list[str] = []
+    reasons: list[tuple[str, str]] = []
+    if not isinstance(raw_candidates, list):
+        return tuple(), tuple()
+    for item in raw_candidates:
+        if isinstance(item, dict):
+            code = str(item.get("symbol") or item.get("code") or "").strip()
+            reason = str(item.get("reason") or "").strip()
+        else:
+            code = str(item).strip()
+            reason = ""
+        if code in codes and code not in symbols:
+            symbols.append(code)
+            reasons.append((code, reason or _candidate_reason(code, theme)))
+    return tuple(symbols[:10]), tuple(reasons[:10])
+
+
+def _infer_theme_and_candidates(text: str, fallback_code: str) -> tuple[str, tuple[str, ...], tuple[tuple[str, str], ...]]:
     compact = text.lower()
     available = {item.code for item in load_symbols()}
     for keywords, codes, theme in THEME_CANDIDATES:
@@ -131,10 +242,11 @@ def _infer_theme_and_candidates(text: str, fallback_code: str) -> tuple[str, tup
             candidates = tuple(code for code in codes if code in available)
             if fallback_code in available and fallback_code not in candidates:
                 candidates = (fallback_code, *candidates)
-            return theme, candidates[:8]
+            candidates = candidates[:8]
+            return theme, candidates, _candidate_reason_pairs(candidates, theme)
     if fallback_code in available:
-        return "User observation", (fallback_code,)
-    return "User observation", tuple()
+        return "User observation", (fallback_code,), _candidate_reason_pairs((fallback_code,), "User observation")
+    return "User observation", tuple(), tuple()
 
 
 def _pick_benchmark_for_symbol(symbol_code: str, fallback_code: str = "SPY") -> str:
@@ -156,7 +268,7 @@ def propose_backtest_spec(
     factor_blend = factor_blend_payload(prototype, answers)
     text = json.dumps({**prototype.as_dict(), "answers": answers}, ensure_ascii=False)
     picked_symbol = _pick_symbol(prototype.target_universe)
-    theme, candidates = _infer_theme_and_candidates(text, picked_symbol)
+    theme, candidates, candidate_reasons = _infer_theme_and_candidates(text, picked_symbol)
     if candidates and (theme != "User observation" or picked_symbol == "SPY" or picked_symbol not in candidates):
         picked_symbol = candidates[0]
     fallback = BacktestSpec(
@@ -172,6 +284,7 @@ def propose_backtest_spec(
         theme=theme,
         user_factor=str(factor_blend["user_factor"]["hypothesis"]),
         candidate_symbols=candidates,
+        candidate_reasons=candidate_reasons,
     )
     if llm is None:
         return fallback
@@ -191,7 +304,7 @@ def propose_backtest_spec(
     system_prompt = (
         "你负责把用户策略雏形映射成已有确定性回测代码可接受的参数。"
         "基础因子库和用户因子必须解耦：基础因子只能从给定列表选择；用户因子只用于解释、筛选和权重建议。"
-        "不能发明策略代码，不能发明标的。"
+        "不能发明策略代码，不能发明标的。候选池要优先从可选标的里选 5-10 个，并说明入选原因。"
         "只返回 JSON。"
     )
     user_prompt = (
@@ -203,6 +316,7 @@ def propose_backtest_spec(
         f"可选窗口：{list(VALID_WINDOWS)}\n\n"
         f"策略雏形与答案：{text}\n\n"
         "返回 JSON 字段：symbol_code, benchmark_code, family, risk_profile, enhanced, window, market, theme, user_factor, candidate_symbols。"
+        "candidate_symbols 可以是字符串数组，也可以是 {symbol, reason} 对象数组。"
     )
     try:
         raw = llm.complete_json(system_prompt, user_prompt)
@@ -214,10 +328,13 @@ def propose_backtest_spec(
     benchmark_code = str(raw.get("benchmark_code") or fallback.benchmark_code)
     raw_candidates = raw.get("candidate_symbols")
     candidate_symbols: tuple[str, ...] = fallback.candidate_symbols
+    candidate_reasons: tuple[tuple[str, str], ...] = fallback.candidate_reasons
     if isinstance(raw_candidates, list):
-        candidate_symbols = tuple(str(code) for code in raw_candidates if str(code) in codes)[:8]
+        parsed_symbols, parsed_reasons = _parse_candidate_payload(raw_candidates, codes, str(raw.get("theme") or fallback.theme))
+        candidate_symbols = parsed_symbols or tuple(str(code) for code in raw_candidates if str(code) in codes)[:8]
         if symbol_code in codes and symbol_code not in candidate_symbols:
             candidate_symbols = (symbol_code, *candidate_symbols)[:8]
+        candidate_reasons = parsed_reasons or _candidate_reason_pairs(candidate_symbols, str(raw.get("theme") or fallback.theme))
     family = raw.get("family") if raw.get("family") in VALID_FAMILIES else fallback.family
     risk = raw.get("risk_profile") if raw.get("risk_profile") in VALID_RISKS else fallback.risk_profile
     window = raw.get("window") if raw.get("window") in VALID_WINDOWS else fallback.window
@@ -234,6 +351,7 @@ def propose_backtest_spec(
         theme=str(raw.get("theme") or fallback.theme),
         user_factor=str(raw.get("user_factor") or fallback.user_factor),
         candidate_symbols=candidate_symbols,
+        candidate_reasons=candidate_reasons,
     )
 
 
@@ -258,8 +376,17 @@ def _selected_benchmark_return(symbol_code: str, window: str) -> tuple[str, floa
     return benchmark_code, float((1 + benchmark_history["return"]).cumprod().iloc[-1] - 1)
 
 
+def _benchmark_curve(symbol_code: str, window: str, column_name: str) -> pd.DataFrame:
+    symbol = _symbol_by_code(symbol_code)
+    history = _slice_window(load_price_data(symbol), window)
+    curve = history[["date", "return"]].copy()
+    curve[column_name] = (1 + curve["return"]).cumprod()
+    return curve[["date", column_name]]
+
+
 def run_candidate_pool_backtest(spec: BacktestSpec) -> pd.DataFrame:
     candidates = list(dict.fromkeys([spec.symbol_code, *spec.candidate_symbols]))
+    reason_map = {symbol: reason for symbol, reason in spec.candidate_reasons}
     rows: list[dict[str, Any]] = []
     for code in candidates[:8]:
         try:
@@ -274,13 +401,14 @@ def run_candidate_pool_backtest(spec: BacktestSpec) -> pd.DataFrame:
                 enhanced=spec.enhanced,
                 description="候选池同策略横向回测。",
             )
-            summary, _curves, _backtests = compare_variants(history, [variant], spec.risk_profile)
+            summary, _curves, _backtests = compare_variants(history, [variant], spec.risk_profile, strategy_params=spec.strategy_params())
             row = summary.iloc[0].to_dict()
             benchmark_code, benchmark_return = _selected_benchmark_return(code, spec.window)
             row.update(
                 {
                     "标的": symbol.code,
                     "名称": symbol.name,
+                    "入选理由": reason_map.get(symbol.code, _candidate_reason(symbol.code, spec.theme)),
                     "市场": symbol.market,
                     "行业": symbol.category,
                     "对照基准": benchmark_code,
@@ -323,13 +451,19 @@ def run_backtest_from_spec(spec: BacktestSpec) -> dict[str, Any]:
             description="同一策略族的风控开关对照。",
         ),
     ]
-    summary, curves, backtests = compare_variants(history, variants, spec.risk_profile)
+    summary, curves, backtests = compare_variants(history, variants, spec.risk_profile, strategy_params=spec.strategy_params())
 
     benchmark_curve = benchmark_history[["date", "return"]].copy()
-    benchmark_curve["benchmark_equity"] = (1 + benchmark_curve["return"]).cumprod()
-    curves = curves.merge(benchmark_curve[["date", "benchmark_equity"]], on="date", how="left")
-    curves["选定基准"] = curves["benchmark_equity"].ffill().bfill()
-    curves = curves.drop(columns=["benchmark_equity"])
+    benchmark_curve["选定基准"] = (1 + benchmark_curve["return"]).cumprod()
+    curves = curves.merge(benchmark_curve[["date", "选定基准"]], on="date", how="left")
+    if spec.benchmark_code != "SPY":
+        try:
+            curves = curves.merge(_benchmark_curve("SPY", spec.window, "SPY"), on="date", how="left")
+        except Exception:
+            pass
+    for column in ["选定基准", "SPY"]:
+        if column in curves.columns:
+            curves[column] = curves[column].ffill().bfill()
 
     return {
         "symbol": symbol,

@@ -3,6 +3,7 @@ from __future__ import annotations
 import time
 from pathlib import Path
 
+import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -29,7 +30,7 @@ from interview_agent import (
     run_interview_turn,
 )
 from market_data import filter_symbols, load_universe, normalize_market, preferred_benchmarks
-from strategyforge import format_pct
+from strategyforge import format_pct, trade_points
 
 
 st.set_page_config(page_title="智塔 Strata", page_icon="ST", layout="wide")
@@ -624,6 +625,7 @@ def _format_candidate_table(summary):
         "推荐",
         "标的",
         "名称",
+        "入选理由",
         "市场",
         "行业",
         "对照基准",
@@ -641,6 +643,26 @@ def _format_candidate_table(summary):
     ]
     columns = [column for column in preferred if column in display.columns]
     return display[columns] if columns else display
+
+
+def _monthly_return_table(bt: pd.DataFrame) -> pd.DataFrame:
+    data = bt[["date", "strategy_return"]].copy()
+    data["date"] = pd.to_datetime(data["date"])
+    data["year"] = data["date"].dt.year
+    data["month"] = data["date"].dt.month
+    monthly = data.groupby(["year", "month"])["strategy_return"].apply(lambda series: (1 + series).prod() - 1)
+    table = monthly.unstack(fill_value=0.0)
+    table = table.reindex(columns=list(range(1, 13)), fill_value=0.0)
+    table.columns = [f"{month}月" for month in table.columns]
+    return table
+
+
+def _format_monthly_table(table: pd.DataFrame) -> pd.DataFrame:
+    return table.applymap(lambda value: format_pct(float(value)))
+
+
+def _param_index(options: list[str], value: str) -> int:
+    return options.index(value) if value in options else 0
 
 
 
@@ -1182,10 +1204,8 @@ def render_backtest_panel(template: InterviewTemplate, answers: dict[str, str]) 
         """,
         unsafe_allow_html=True,
     )
-    structured_spec = spec.as_dict()
-    structured_spec["candidate_symbols"] = list(spec.candidate_symbols)
     st.caption("结构化策略规格")
-    st.json(structured_spec, expanded=False)
+    st.json(spec.as_dict(), expanded=False)
 
     current_symbol = symbol_by_code.get(spec.symbol_code, symbols[0])
     filter_a, filter_b, filter_c = st.columns([1, 1, 1.4])
@@ -1253,7 +1273,50 @@ def render_backtest_panel(template: InterviewTemplate, answers: dict[str, str]) 
         risk = st.selectbox("\u98ce\u9669\u6863\u4f4d", list(VALID_RISKS), index=list(VALID_RISKS).index(spec.risk_profile))
         enhanced = st.checkbox("\u542f\u7528\u786e\u5b9a\u6027\u98ce\u63a7\u589e\u5f3a", value=spec.enhanced)
 
+    ma_options = ["20/60", "10/50", "50/200"]
+    rsi_options = ["30/55", "25/60"]
+    stop_loss_options = ["7%", "11%", "16%"]
+    param_a, param_b, param_c = st.columns(3)
+    with param_a:
+        ma_pair = st.selectbox(
+            "均线参数",
+            ma_options,
+            index=_param_index(ma_options, f"{spec.fast_ma}/{spec.slow_ma}"),
+            key="strategy_ma_pair",
+        )
+        max_hold_days = st.selectbox(
+            "最大持有期",
+            [20, 40],
+            index=0 if int(spec.max_hold_days) == 20 else 1,
+            key="strategy_max_hold_days",
+        )
+    with param_b:
+        rsi_pair = st.selectbox(
+            "RSI 参数",
+            rsi_options,
+            index=_param_index(rsi_options, f"{int(spec.rsi_entry)}/{int(spec.rsi_exit)}"),
+            key="strategy_rsi_pair",
+        )
+        stop_loss_pct = st.selectbox(
+            "止损",
+            stop_loss_options,
+            index=_param_index(stop_loss_options, f"{int(round((spec.stop_loss or 0.11) * 100))}%"),
+            key="strategy_stop_loss",
+        )
+    with param_c:
+        cost_bps = st.number_input(
+            "交易成本 bps",
+            min_value=0.0,
+            max_value=50.0,
+            value=float(spec.cost_bps if spec.cost_bps is not None else 6.0),
+            step=1.0,
+            key="strategy_cost_bps",
+        )
+        st.caption("bps 是万分之一，6 bps 约等于 0.06%。")
+
     if st.button("\u8fd0\u884c\u56de\u6d4b", type="primary", use_container_width=True):
+        fast_ma, slow_ma = [int(item) for item in ma_pair.split("/")]
+        rsi_entry, rsi_exit = [float(item) for item in rsi_pair.split("/")]
         chosen = BacktestSpec(
             symbol_code=target_labels[target_label],
             benchmark_code=benchmark_labels[benchmark_label],
@@ -1267,6 +1330,14 @@ def render_backtest_panel(template: InterviewTemplate, answers: dict[str, str]) 
             theme=spec.theme,
             user_factor=spec.user_factor or str(factor_blend["user_factor"]["hypothesis"]),
             candidate_symbols=spec.candidate_symbols,
+            candidate_reasons=spec.candidate_reasons,
+            fast_ma=fast_ma,
+            slow_ma=slow_ma,
+            rsi_entry=rsi_entry,
+            rsi_exit=rsi_exit,
+            max_hold_days=int(max_hold_days),
+            stop_loss=float(stop_loss_pct.rstrip("%")) / 100,
+            cost_bps=float(cost_bps),
         )
         st.session_state.backtest_spec = chosen
         st.session_state.backtest_result = run_backtest_from_spec(chosen)
@@ -1303,9 +1374,31 @@ def render_backtest_panel(template: InterviewTemplate, answers: dict[str, str]) 
     if candidate_pool is not None and not candidate_pool.empty and len(candidate_pool) > 1:
         st.markdown("##### 候选池横向比较")
         st.dataframe(_format_candidate_table(candidate_pool), hide_index=True, use_container_width=True)
+        if "累计收益" in candidate_pool.columns:
+            pool_chart = candidate_pool[["标的", "累计收益"]].copy().set_index("标的")
+            st.bar_chart(pool_chart)
     st.markdown("##### \u65b9\u6848\u660e\u7ec6")
     st.dataframe(_format_summary_table(summary), hide_index=True, use_container_width=True)
+    st.markdown("##### 净值曲线")
     st.line_chart(curves)
+    backtests = result.get("backtests", {})
+    best_bt = backtests.get(best_variant)
+    if best_bt is not None and not best_bt.empty:
+        chart_a, chart_b = st.columns(2)
+        with chart_a:
+            st.markdown("##### 回撤曲线")
+            drawdown = best_bt[["date", "drawdown"]].copy().set_index("date")
+            st.line_chart(drawdown)
+        with chart_b:
+            st.markdown("##### 月度收益")
+            st.dataframe(_format_monthly_table(_monthly_return_table(best_bt)), use_container_width=True)
+
+        points = trade_points(best_bt)
+        if not points.empty:
+            st.markdown("##### 买卖点")
+            display_points = points.tail(12).copy()
+            display_points["价格"] = display_points["价格"].map(lambda value: f"{float(value):.2f}")
+            st.dataframe(display_points, hide_index=True, use_container_width=True)
     render_post_backtest_actions(template, prototype, st.session_state.backtest_spec, result)
 
 templates = load_templates()
