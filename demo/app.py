@@ -1379,6 +1379,17 @@ def render_backtest_panel(template: InterviewTemplate, answers: dict[str, str]) 
             st.bar_chart(pool_chart)
     st.markdown("##### \u65b9\u6848\u660e\u7ec6")
     st.dataframe(_format_summary_table(summary), hide_index=True, use_container_width=True)
+    walk_forward = result.get("walk_forward", {})
+    if walk_forward.get("enabled"):
+        st.markdown("##### Walk-forward 简化验证")
+        wf_a, wf_b = st.columns([1, 2])
+        with wf_a:
+            st.caption(f"切分点：{walk_forward.get('split_date', '-')}")
+            st.json(walk_forward.get("best_params", {}), expanded=False)
+        with wf_b:
+            st.dataframe(_format_summary_table(walk_forward["report"]), hide_index=True, use_container_width=True)
+    elif walk_forward.get("reason"):
+        st.caption(walk_forward["reason"])
     st.markdown("##### 净值曲线")
     st.line_chart(curves)
     backtests = result.get("backtests", {})

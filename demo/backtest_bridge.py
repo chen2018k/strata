@@ -21,6 +21,9 @@ try:
         format_pct,
         load_price_data,
         load_symbols,
+        score_summary,
+        summarize_backtest,
+        backtest,
     )
 except ModuleNotFoundError:
     from .agent_runtime import LLMClient
@@ -36,6 +39,9 @@ except ModuleNotFoundError:
         format_pct,
         load_price_data,
         load_symbols,
+        score_summary,
+        summarize_backtest,
+        backtest,
     )
 
 
@@ -429,6 +435,113 @@ def run_candidate_pool_backtest(spec: BacktestSpec) -> pd.DataFrame:
     return df
 
 
+def _walk_forward_param_grid(spec: BacktestSpec) -> list[StrategyParams]:
+    ma_pairs = [(spec.fast_ma, spec.slow_ma), (10, 50), (20, 60), (50, 200)]
+    rsi_pairs = [(spec.rsi_entry, spec.rsi_exit), (25.0, 60.0), (30.0, 55.0)]
+    hold_days = [int(spec.max_hold_days), 20, 40]
+    stop_losses = [float(spec.stop_loss or 0.11), 0.07, 0.11, 0.16]
+    seen: set[tuple[float, ...]] = set()
+    params: list[StrategyParams] = []
+    for fast_ma, slow_ma in ma_pairs:
+        for rsi_entry, rsi_exit in rsi_pairs:
+            for max_hold in hold_days:
+                for stop_loss in stop_losses:
+                    key = (float(fast_ma), float(slow_ma), float(rsi_entry), float(rsi_exit), float(max_hold), round(stop_loss, 4))
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    params.append(
+                        StrategyParams(
+                            fast_ma=int(fast_ma),
+                            slow_ma=int(slow_ma),
+                            rsi_entry=float(rsi_entry),
+                            rsi_exit=float(rsi_exit),
+                            max_hold_days=int(max_hold),
+                            stop_loss=float(stop_loss),
+                            cost_bps=spec.cost_bps,
+                        )
+                    )
+                    if len(params) >= 18:
+                        return params
+    return params
+
+
+def run_walk_forward_validation(history: pd.DataFrame, spec: BacktestSpec) -> dict[str, Any]:
+    if len(history) < 240:
+        return {"enabled": False, "reason": "历史数据不足，暂不做 Walk-forward 验证。"}
+
+    split_at = max(120, int(len(history) * 0.7))
+    train = history.iloc[:split_at].reset_index(drop=True)
+    validate = history.iloc[split_at:].reset_index(drop=True)
+    if len(validate) < 60:
+        return {"enabled": False, "reason": "验证期太短，暂不做 Walk-forward 验证。"}
+
+    rows: list[dict[str, Any]] = []
+    variant = StrategyVariant(
+        name="参数候选",
+        family=spec.family,
+        risk_profile=spec.risk_profile,
+        enhanced=spec.enhanced,
+        description="Walk-forward 参数候选。",
+    )
+    for params in _walk_forward_param_grid(spec):
+        train_bt = backtest(train, variant.family, variant.enhanced, variant.risk_profile, strategy_params=params)
+        summary = summarize_backtest(train_bt)
+        scores = score_summary(summary, spec.risk_profile)
+        rows.append(
+            {
+                "fast_ma": params.fast_ma,
+                "slow_ma": params.slow_ma,
+                "rsi_entry": params.rsi_entry,
+                "rsi_exit": params.rsi_exit,
+                "max_hold_days": params.max_hold_days,
+                "stop_loss": params.stop_loss,
+                **summary,
+                **scores,
+            }
+        )
+
+    if not rows:
+        return {"enabled": False, "reason": "没有可用参数组合。"}
+
+    train_grid = pd.DataFrame(rows).sort_values("综合评分", ascending=False).reset_index(drop=True)
+    best = train_grid.iloc[0]
+    best_params = StrategyParams(
+        fast_ma=int(best["fast_ma"]),
+        slow_ma=int(best["slow_ma"]),
+        rsi_entry=float(best["rsi_entry"]),
+        rsi_exit=float(best["rsi_exit"]),
+        max_hold_days=int(best["max_hold_days"]),
+        stop_loss=float(best["stop_loss"]),
+        cost_bps=spec.cost_bps,
+    )
+    train_bt = backtest(train, spec.family, spec.enhanced, spec.risk_profile, strategy_params=best_params)
+    validate_bt = backtest(validate, spec.family, spec.enhanced, spec.risk_profile, strategy_params=best_params)
+    train_base_summary = summarize_backtest(train_bt)
+    validate_base_summary = summarize_backtest(validate_bt)
+    train_summary = {**train_base_summary, **score_summary(train_base_summary, spec.risk_profile)}
+    validate_summary = {**validate_base_summary, **score_summary(validate_base_summary, spec.risk_profile)}
+    report = pd.DataFrame(
+        [
+            {"阶段": "训练期 70%", **train_summary},
+            {"阶段": "验证期 30%", **validate_summary},
+        ]
+    )
+    return {
+        "enabled": True,
+        "split_date": str(validate["date"].iloc[0]),
+        "best_params": {
+            "均线": f"{best_params.fast_ma}/{best_params.slow_ma}",
+            "RSI": f"{best_params.rsi_entry:.0f}/{best_params.rsi_exit:.0f}",
+            "最大持有期": best_params.max_hold_days,
+            "止损": best_params.stop_loss,
+            "交易成本 bps": best_params.cost_bps,
+        },
+        "report": report,
+        "train_grid": train_grid.head(8),
+    }
+
+
 def run_backtest_from_spec(spec: BacktestSpec) -> dict[str, Any]:
     symbol = _symbol_by_code(spec.symbol_code)
     benchmark = _symbol_by_code(spec.benchmark_code)
@@ -473,6 +586,7 @@ def run_backtest_from_spec(spec: BacktestSpec) -> dict[str, Any]:
         "curves": curves,
         "backtests": backtests,
         "candidate_pool": run_candidate_pool_backtest(spec),
+        "walk_forward": run_walk_forward_validation(history, spec),
     }
 
 
